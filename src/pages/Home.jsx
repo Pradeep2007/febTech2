@@ -4,8 +4,10 @@ import {
   FaShieldAlt, 
   FaUsers, 
   FaAward,
-  FaChevronRight,
-  FaBox
+  FaBox,
+  FaShoppingCart,
+  FaHandshake,
+  FaChevronRight
 } from 'react-icons/fa';
 
 const Home = () => {
@@ -90,10 +92,28 @@ const Home = () => {
       transition={{ duration: 0.5 }}
     >
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-44">
+      <section className="relative min-h-[86vh] md:min-h-screen flex items-center justify-center overflow-hidden pt-36 md:pt-40 pb-16">
         {/* Background */}
         <div className="absolute inset-0 gradient-bg" />
         <div className="absolute inset-0 bg-black/20" />
+
+        {/* Soft glow accents */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-24 -left-24 w-[28rem] h-[28rem] blur-3xl opacity-30"
+          style={{
+            background:
+              'radial-gradient( circle at center, rgba(255,225,150,0.45) 0%, rgba(255,200,100,0.25) 35%, rgba(255,255,255,0) 70% )'
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-24 -right-24 w-[24rem] h-[24rem] blur-3xl opacity-25"
+          style={{
+            background:
+              'radial-gradient( circle at center, rgba(99,179,237,0.35) 0%, rgba(20,184,166,0.2) 40%, rgba(255,255,255,0) 70% )'
+          }}
+        />
 
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
@@ -123,36 +143,41 @@ const Home = () => {
           />
         </div>
 
-        <div className="relative z-10 container-max text-center">
+        <div className="relative z-10 container-max px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto"
+            className="max-w-5xl mx-auto"
           >
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Your Trusted
-              <span className="block text-light-teal">Healthcare Partner</span>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold text-white mb-6 md:mb-8 leading-[1.15] tracking-tight">
+              Leading Medical Equipment Provider
+              <span className="block bg-gradient-to-r from-teal-200 via-cyan-200 to-white bg-clip-text text-transparent">
+                Delivering Advanced Medical Technology for Better Patient Care
+              </span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
-              Providing premium medical supplies, pharmaceuticals, and equipment
-              with uncompromising quality and regulatory compliance.
+            <p className="text-lg md:text-xl lg:text-2xl text-white/90 mb-8 md:mb-10 max-w-4xl mx-auto leading-relaxed">
+              At Fabtech Inc, we empower hospitals, laboratories, and healthcare professionals with innovative
+              healthcare solutions, diagnostic devices, surgical equipment, and biomedical equipment. Our mission is
+              to improve quality of life by ensuring accessible medical equipment, supporting doctors, and enhancing
+              patient outcomes.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-10 md:mb-12">
               <Link
                 to="/products"
-                className="btn-primary text-lg px-8 py-4 inline-flex items-center"
+                className="inline-flex items-center justify-center gap-2 rounded-xl text-base md:text-lg px-7 md:px-8 py-3.5 md:py-4 text-white bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 transition-colors shadow-lg shadow-black/10 font-semibold whitespace-nowrap min-w-[270px] md:min-w-[320px]"
               >
-                Explore Products
-                <FaChevronRight className="ml-2" size={20} />
+                <FaShoppingCart className="opacity-90" size={20} />
+                Explore Our Medical Supplies
               </Link>
               <Link
-                to="/about"
-                className="btn-outline text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-teal-prime"
+                to="/contact"
+                className="inline-flex items-center justify-center gap-2 rounded-xl text-base md:text-lg px-7 md:px-8 py-3.5 md:py-4 text-white bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 transition-colors shadow-lg shadow-black/10 font-semibold whitespace-nowrap min-w-[270px] md:min-w-[320px]"
               >
-                Learn More
+                <FaHandshake className="opacity-90" size={20} />
+                Partner with Us for Healthcare Excellence
               </Link>
             </div>
           </motion.div>
@@ -393,34 +418,6 @@ const Home = () => {
                 <span className="font-semibold text-gray-700">{partner}</span>
               </div>
             ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="gradient-bg text-white section-padding">
-        <div className="container-max text-center">
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl font-bold mb-6">
-              Ready to Partner with Us?
-            </h2>
-            <p className="text-xl text-light-teal mb-8 max-w-2xl mx-auto">
-              Join hundreds of healthcare providers who trust FabTech for their 
-              medical equipment and pharmaceutical needs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/contact" className="btn-secondary">
-                Get Started Today
-              </Link>
-              <Link to="/about" className="btn-outline border-white text-white hover:bg-white hover:text-teal-prime">
-                Learn More About Us
-              </Link>
-            </div>
           </motion.div>
         </div>
       </section>

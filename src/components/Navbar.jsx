@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import logo from '../assets/images/logo1.png';
 import { motion } from 'framer-motion';
 import { FaBars, FaTimes, FaUserShield } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
@@ -13,7 +14,7 @@ const Navbar = () => {
     { name: 'Home', path: '/' },
     { name: 'About', path: '/about' },
     { name: 'Products', path: '/products' },
-    { name: 'Compliance', path: '/compliance' },
+    { name: 'Members', path: '/members' },
     { name: 'Clients', path: '/clients' },
     { name: 'FAQ', path: '/faq' },
     { name: 'Contact', path: '/contact' },
@@ -32,11 +33,14 @@ const Navbar = () => {
       <div className="container-max">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-teal-prime rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">FT</span>
-            </div>
-            <span className="text-2xl font-bold text-teal-prime">FabTech</span>
+          <Link to="/" className="flex items-center">
+            <img
+              src={logo}
+              alt="Fabtech Inc logo"
+              className="h-10 w-auto md:h-12 object-contain"
+              loading="eager"
+              fetchpriority="high"
+            />
           </Link>
 
           {/* Desktop Navigation */}

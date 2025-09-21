@@ -11,7 +11,7 @@ import Footer from './components/Footer';
 import Home from './pages/Home';
 import About from './pages/About';
 import Products from './pages/Products';
-import Compliance from './pages/Compliance';
+import Members from './pages/Members';
 import Clients from './pages/Clients';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
@@ -50,7 +50,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/about" element={<About />} />
               <Route path="/products" element={<Products />} />
-              <Route path="/compliance" element={<Compliance />} />
+              <Route path="/members" element={<Members />} />
               <Route path="/clients" element={<Clients />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />
