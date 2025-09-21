@@ -94,8 +94,8 @@ const Admin = () => {
 
   const filteredProducts = products.filter(product =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.brand.toLowerCase().includes(searchTerm.toLowerCase())
+    (product.category || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (product.brand || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const filteredFaqs = faqs.filter(faq =>
@@ -111,8 +111,8 @@ const Admin = () => {
     reset({
       name: '',
       sku: '',
-      category: 'Equipment',
-      brand: 'Sysmax-Biosystems',
+      category: 'Harmone analyzer',
+      brand: '',
       price: '',
       stock: '',
       description: '',
@@ -392,8 +392,8 @@ const Admin = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
                 >
                   <option value="">Select Category</option>
-                  <option value="Equipment">Equipment</option>
-                  <option value="Medicines">Medicines</option>
+                  <option value="Harmone analyzer">Harmone analyzer</option>
+                  <option value="Biochemistry analyzer">Biochemistry analyzer</option>
                 </select>
                 {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
               </div>
@@ -610,17 +610,20 @@ const Admin = () => {
                         Product
                       </th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        SKU
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Category
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Brand
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      </th> */}
+                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Price
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      </th> */}
+                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Stock
-                      </th>
+                      </th> */}
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
                       </th>
@@ -630,23 +633,23 @@ const Admin = () => {
                     {filteredProducts.map((product) => (
                       <tr key={product.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                            <div className="text-sm text-gray-500">{product.description?.substring(0, 50)}...</div>
-                          </div>
+                          <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {product.sku || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                             {product.category}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {product.brand}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        </td> */}
+                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           ${product.price}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        </td> */}
+                        {/* <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             (product.stock || product.stockQuantity) > 50 ? 'bg-green-100 text-green-800' :
                             (product.stock || product.stockQuantity) > 10 ? 'bg-yellow-100 text-yellow-800' :
@@ -654,7 +657,7 @@ const Admin = () => {
                           }`}>
                             {product.stock || product.stockQuantity} units
                           </span>
-                        </td>
+                        </td> */}
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">
                             <button
@@ -757,6 +760,20 @@ const Admin = () => {
                       {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
                     </div>
 
+                    {/* SKU Number */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        SKU Number *
+                      </label>
+                      <input
+                        type="text"
+                        {...register('sku', { required: 'SKU is required' })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                        placeholder="e.g., SKU-12345"
+                      />
+                      {errors.sku && <p className="text-red-500 text-sm mt-1">{errors.sku.message}</p>}
+                    </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Category *
@@ -765,15 +782,14 @@ const Admin = () => {
                         {...register('category', { required: 'Category is required' })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
                       >
-                        <option value="Equipment">Equipment</option>
-                        <option value="Medicines">Medicines</option>
-                        <option value="Supplies">Supplies</option>
+                        <option value="Harmone analyzer">Harmone analyzer</option>
+                        <option value="Biochemistry analyzer">Biochemistry analyzer</option>
                       </select>
                     </div>
 
-                    <div>
+                    {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Brand *
+                        SubCategory *
                       </label>
                       <select
                         {...register('brand', { required: 'Brand is required' })}
@@ -782,9 +798,9 @@ const Admin = () => {
                         <option value="Sysmax-Biosystems">Sysmax-Biosystems</option>
                         <option value="Rest Inc.">Rest Inc.</option>
                       </select>
-                    </div>
+                    </div> */}
 
-                    <div>
+                    {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Price *
                       </label>
@@ -794,9 +810,9 @@ const Admin = () => {
                         {...register('price', { required: 'Price is required' })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
                       />
-                    </div>
+                    </div> */}
 
-                    <div>
+                    {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Stock Quantity *
                       </label>
@@ -805,7 +821,7 @@ const Admin = () => {
                         {...register('stock', { required: 'Stock is required' })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
                       />
-                    </div>
+                    </div> */}
                   </div>
 
                   <div>
@@ -819,7 +835,7 @@ const Admin = () => {
                     />
                   </div>
 
-                  <div>
+                  {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Specifications (JSON format)
                     </label>
@@ -829,7 +845,7 @@ const Admin = () => {
                       placeholder='{"key": "value", "key2": "value2"}'
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent font-mono text-sm"
                     />
-                  </div>
+                  </div> */}
 
                   <div className="flex justify-end space-x-4 pt-4">
                     <button

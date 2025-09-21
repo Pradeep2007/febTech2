@@ -4,21 +4,63 @@ import logo from '../assets/images/logo1.png';
 import { motion } from 'framer-motion';
 import { FaBars, FaTimes, FaUserShield } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
+import useScrollSpy from '../hooks/useScrollSpy';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { isAdmin, logout } = useAuth();
 
+  // Define sections for scroll spy (only on home page)
+  const sectionIds = ['home', 'about', 'products', 'members', 'clients', 'faq', 'contact'];
+  const activeSection = useScrollSpy(sectionIds, 150);
+
   const navItems = [
-    { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
-    { name: 'Products', path: '/products' },
-    { name: 'Members', path: '/members' },
-    { name: 'Clients', path: '/clients' },
-    { name: 'FAQ', path: '/faq' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'Home', path: '/', sectionId: 'home' },
+    { name: 'About', path: '/about', sectionId: 'about' },
+    { name: 'Products', path: '/products', sectionId: 'products' },
+    { name: 'Members', path: '/members', sectionId: 'members' },
+    { name: 'Clients', path: '/clients', sectionId: 'clients' },
+    { name: 'FAQ', path: '/faq', sectionId: 'faq' },
+    { name: 'Contact', path: '/contact', sectionId: 'contact' },
   ];
+
+  // Function to handle navigation
+  const handleNavigation = (item, e) => {
+    // If we're on the home page and the section exists, scroll to it
+    if (location.pathname === '/' && document.getElementById(item.sectionId)) {
+      e.preventDefault();
+      const element = document.getElementById(item.sectionId);
+      
+      // Get the navbar height to offset the scroll position
+      const navbar = document.querySelector('nav');
+      const navbarHeight = navbar ? navbar.offsetHeight : 80;
+      
+      // Calculate the exact position to scroll to
+      const elementPosition = element.offsetTop;
+      const offsetPosition = elementPosition - navbarHeight;
+      
+      // Scroll to the exact position
+      window.scrollTo({
+        top: Math.max(0, offsetPosition),
+        behavior: 'smooth'
+      });
+      
+      setIsOpen(false);
+    }
+    // Otherwise, navigate normally (handled by Link)
+  };
+
+  // Determine if item should be active
+  const isItemActive = (item) => {
+    if (location.pathname === '/') {
+      // On home page, use scroll spy
+      return activeSection === item.sectionId;
+    } else {
+      // On other pages, use pathname
+      return location.pathname === item.path;
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -33,7 +75,21 @@ const Navbar = () => {
       <div className="container-max">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
+          <Link 
+            to="/" 
+            className="flex items-center hover:opacity-80 transition-opacity duration-200"
+            onClick={(e) => {
+              // If we're already on home page, scroll to top
+              if (location.pathname === '/') {
+                e.preventDefault();
+                window.scrollTo({
+                  top: 0,
+                  behavior: 'smooth'
+                });
+              }
+              // Otherwise, navigate to home page (handled by Link)
+            }}
+          >
             <img
               src={logo}
               alt="Fabtech Inc logo"
@@ -49,14 +105,15 @@ const Navbar = () => {
               <Link
                 key={item.name}
                 to={item.path}
+                onClick={(e) => handleNavigation(item, e)}
                 className={`relative font-medium transition-colors duration-300 ${
-                  location.pathname === item.path
+                  isItemActive(item)
                     ? 'text-teal-prime'
                     : 'text-gray-700 hover:text-teal-prime'
                 }`}
               >
                 {item.name}
-                {location.pathname === item.path && (
+                {isItemActive(item) && (
                   <motion.div
                     className="absolute -bottom-1 left-0 right-0 h-0.5 bg-teal-prime"
                     layoutId="underline"
@@ -86,9 +143,9 @@ const Navbar = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleNavigation(item, e)}
                 className={`block font-medium transition-colors duration-300 ${
-                  location.pathname === item.path
+                  isItemActive(item)
                     ? 'text-teal-prime'
                     : 'text-gray-700 hover:text-teal-prime'
                 }`}

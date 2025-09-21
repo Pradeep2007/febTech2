@@ -285,7 +285,7 @@ const FAQ = () => {
       </section>
 
       {/* Contact Support Section */}
-      <section className="section-padding bg-white">
+      {/* <section className="section-padding bg-white">
         <div className="container-max">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
@@ -341,9 +341,9 @@ const FAQ = () => {
             </div>
           </motion.div>
         </div>
-      </section>
+      </section> */}
 
-      {/* Quick Links */}
+      {/* Quick Links
       <section className="section-padding bg-light-gray">
         <div className="container-max">
           <motion.div
@@ -395,7 +395,7 @@ const FAQ = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
     </motion.div>
   );
 };

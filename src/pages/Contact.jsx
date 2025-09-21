@@ -9,7 +9,8 @@ import {
   FaUser,
   FaBuilding,
   FaPaperPlane,
-  FaCheckCircle
+  FaCheckCircle,
+  FaLinkedin
 } from 'react-icons/fa';
 
 const Contact = () => {
@@ -112,9 +113,9 @@ const Contact = () => {
       </section>
 
       {/* Contact Information */}
-      <section className="section-padding bg-white">
+      <section className=" bg-white">
         <div className="container-max">
-          <motion.div
+          {/* <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
@@ -127,9 +128,9 @@ const Contact = () => {
             <p className="text-xl text-gray-600">
               Multiple ways to reach our team
             </p>
-          </motion.div>
+          </motion.div> */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {contactInfo.map((info, index) => (
               <motion.div
                 key={info.title}
@@ -153,7 +154,7 @@ const Contact = () => {
                 <p className="text-gray-600 text-sm">{info.description}</p>
               </motion.div>
             ))}
-          </div>
+          </div> */}
         </div>
       </section>
 
@@ -340,44 +341,72 @@ const Contact = () => {
               viewport={{ once: true }}
               className="space-y-8"
             >
-              {/* Map Placeholder */}
+              {/* Phone Contact */}
               <div className="card p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                  Our Location
-                </h3>
-                <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
-                  <div className="text-center">
-                    <FaMapMarkerAlt className="text-4xl text-teal-prime mx-auto mb-2" />
-                    <p className="text-gray-600">Interactive Map</p>
-                    <p className="text-sm text-gray-500">123 Medical District, Healthcare City</p>
-                  </div>
-                </div>
                 <div className="text-center">
-                  <button className="btn-outline">
-                    Get Directions
-                  </button>
+                  <FaPhone className="text-4xl text-teal-prime mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    Phone Support
+                  </h3>
+                  <div className="space-y-2">
+                    <p className="text-lg font-semibold text-gray-800">
+                      +91 98765 43210
+                    </p>
+                    <p className="text-gray-600">
+                      Monday - Friday: 9:00 AM - 6:00 PM
+                    </p>
+                    <p className="text-gray-600">
+                      Saturday: 9:00 AM - 2:00 PM
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Emergency Contact */}
-              <div className="card p-8 bg-red-50 border-l-4 border-red-500">
-                <h3 className="text-xl font-bold text-red-800 mb-4">
-                  Emergency Orders
-                </h3>
-                <p className="text-red-700 mb-4">
-                  For urgent medical supply needs outside business hours:
-                </p>
-                <div className="space-y-2">
-                  <p className="font-semibold text-red-800">
-                    📞 Emergency Hotline: +1 (555) 123-4570
-                  </p>
-                  <p className="font-semibold text-red-800">
-                    ✉️ Emergency Email: emergency@fabtech.com
-                  </p>
+              {/* Email Contact */}
+              <div className="card p-8">
+                <div className="text-center">
+                  <FaEnvelope className="text-4xl text-blue-600 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    Email Support
+                  </h3>
+                  <div className="space-y-2">
+                    <p className="text-lg font-semibold text-gray-800">
+                      info@fabtech.com
+                    </p>
+                    <p className="text-gray-600">
+                      We respond within 24 hours
+                    </p>
+                    <p className="text-gray-600">
+                      For business inquiries and support
+                    </p>
+                  </div>
                 </div>
-                <p className="text-sm text-red-600 mt-4">
-                  Available 24/7 for critical healthcare supply emergencies
-                </p>
+              </div>
+
+              {/* LinkedIn Contact */}
+              <div className="card p-8">
+                <div className="text-center">
+                  <FaLinkedin className="text-4xl text-blue-700 mx-auto mb-4" />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    LinkedIn
+                  </h3>
+                  <div className="space-y-2">
+                    <p className="text-lg font-semibold text-gray-800">
+                      @FabTechHealthcare
+                    </p>
+                    <p className="text-gray-600">
+                      Connect with us professionally
+                    </p>
+                    <a 
+                      href="https://linkedin.com/company/fabtech-healthcare" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="inline-block mt-3 btn-primary"
+                    >
+                      Follow Us
+                    </a>
+                  </div>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -385,7 +414,7 @@ const Contact = () => {
       </section>
 
       {/* Department Contacts */}
-      <section className="section-padding bg-white">
+      {/* <section className="section-padding bg-white">
         <div className="container-max">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
@@ -430,10 +459,10 @@ const Contact = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
-      <section className="gradient-bg text-white section-padding">
+      {/* <section className="gradient-bg text-white section-padding">
         <div className="container-max text-center">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
@@ -458,7 +487,7 @@ const Contact = () => {
             </div>
           </motion.div>
         </div>
-      </section>
+      </section> */}
     </motion.div>
   );
 };

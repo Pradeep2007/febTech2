@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import logo from '../assets/images/logo1.png';
 
 const SplashScreen = () => {
   return (
@@ -17,18 +18,22 @@ const SplashScreen = () => {
           className="mb-8"
         >
           {/* Company Logo */}
-          <div className="w-32 h-32 mx-auto mb-6 bg-white rounded-full flex items-center justify-center shadow-2xl">
-            <div className="text-4xl font-bold text-teal-prime">FT</div>
+          <div className="w-32 h-32 mx-auto mb-6 bg-white rounded-full flex items-center justify-center shadow-2xl p-4">
+            <img 
+              src={logo} 
+              alt="Fabtech Inc Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           
-          <motion.h1
+          {/* <motion.h1
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
             className="text-5xl font-bold text-white mb-4"
           >
-            FabTech
-          </motion.h1>
+            
+          </motion.h1> */}
           
           <motion.p
             initial={{ y: 20, opacity: 0 }}
@@ -40,14 +45,35 @@ const SplashScreen = () => {
           </motion.p>
         </motion.div>
         
-        {/* Loading Animation */}
+        {/* Loading Bar */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.5 }}
-          className="flex justify-center"
+          className="w-64 mx-auto"
         >
-          <div className="loading-spinner border-white border-t-light-teal"></div>
+          <div className="w-full bg-white/20 rounded-full h-2 overflow-hidden">
+            <motion.div
+              className="h-full bg-gradient-to-r from-light-teal to-white rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ 
+                delay: 1.2, 
+                duration: 2, 
+                ease: "easeInOut",
+                repeat: Infinity,
+                repeatType: "loop"
+              }}
+            />
+          </div>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5, duration: 0.5 }}
+            className="text-center text-white/80 text-sm mt-3"
+          >
+            Loading...
+          </motion.p>
         </motion.div>
       </div>
     </motion.div>

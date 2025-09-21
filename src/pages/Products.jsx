@@ -3,9 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   FaFilter, 
   FaSearch, 
-  FaShoppingCart, 
   FaInfoCircle,
-  FaCheck,
   FaTimes
 } from 'react-icons/fa';
 import { getProducts, sampleProducts } from '../services/productService';
@@ -16,7 +14,6 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedBrand, setSelectedBrand] = useState('All');
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
@@ -25,7 +22,7 @@ const Products = () => {
 
   useEffect(() => {
     filterProducts();
-  }, [products, searchTerm, selectedCategory, selectedBrand]);
+  }, [products, searchTerm, selectedCategory]);
 
   const loadProducts = async () => {
     try {
@@ -64,74 +61,67 @@ const Products = () => {
       filtered = filtered.filter(product => product.category === selectedCategory);
     }
 
-    // Filter by brand
-    if (selectedBrand !== 'All') {
-      filtered = filtered.filter(product => product.brand === selectedBrand);
-    }
+    // Brand filter removed (showcase only)
 
     setFilteredProducts(filtered);
   };
 
   const categories = ['All', ...new Set(products.map(p => p.category))].filter(Boolean);
-  const brands = ['All', ...new Set(products.map(p => p.brand))].filter(Boolean);
 
   const ProductCard = ({ product }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="card p-6"
+      whileHover={{ y: -8 }}
+      className="relative rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-xl transition-shadow overflow-hidden"
     >
-      <div className="aspect-w-16 aspect-h-12 mb-4">
-        <div className="w-full h-48 bg-gray-200 rounded-lg flex items-center justify-center">
+      {/* Image */}
+      <div className="relative w-full h-48 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200" />
+        <div className="relative z-10 w-full h-full flex items-center justify-center">
           <span className="text-gray-500">Product Image</span>
         </div>
+        {/* Zoom on hover */}
+        <motion.div
+          className="absolute inset-0"
+          whileHover={{ scale: 1.06 }}
+          transition={{ duration: 0.4 }}
+        />
       </div>
-      
-      <div className="mb-2">
-        <span className="inline-block bg-teal-prime text-white text-xs px-2 py-1 rounded-full">
-          {product.category}
-        </span>
-        <span className="inline-block bg-blue text-white text-xs px-2 py-1 rounded-full ml-2">
-          {product.brand}
-        </span>
-      </div>
-      
-      <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.name}</h3>
-      <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
-      
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm text-gray-500">SKU: {product.sku}</span>
-        <div className="flex items-center">
-          {product.inStock ? (
-            <span className="flex items-center text-green-500 text-sm">
-              <FaCheck className="mr-1" /> In Stock
-            </span>
-          ) : (
-            <span className="flex items-center text-red-500 text-sm">
-              <FaTimes className="mr-1" /> Out of Stock
-            </span>
-          )}
+
+      {/* Body */}
+      <div className="p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="px-2 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-medium border border-teal-100">
+            {product.category}
+          </span>
         </div>
-      </div>
-      
-      <div className="flex items-center justify-between">
-        <span className="text-2xl font-bold text-teal-prime">
-          ${product.price}
-        </span>
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setSelectedProduct(product)}
-            className="flex items-center bg-blue text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors text-sm"
-          >
-            <FaInfoCircle className="mr-1" />
-            Details
-          </button>
-          <button className="flex items-center bg-orange text-white px-3 py-2 rounded-lg hover:bg-orange-600 transition-colors text-sm">
-            <FaShoppingCart className="mr-1" />
-            Quote
-          </button>
-        </div>
+
+        <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
+          {product.name}
+        </h3>
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
+
+        {/* Specs preview (up to 3) */}
+        {product.specifications && Object.keys(product.specifications).length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-5">
+            {Object.entries(product.specifications).slice(0,3).map(([key, value]) => (
+              <span key={key} className="px-2 py-1 rounded-full bg-gray-50 text-gray-700 text-xs border border-gray-200">
+                {key}: {String(value)}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {/* CTA full width */}
+        <button
+          onClick={() => setSelectedProduct(product)}
+          className="w-full inline-flex items-center justify-center gap-2 rounded-lg text-sm px-4 py-2.5 text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 transition-colors shadow"
+        >
+          <FaInfoCircle />
+          Details
+        </button>
       </div>
     </motion.div>
   );
@@ -173,16 +163,8 @@ const Products = () => {
                   <span>{product.sku}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="font-semibold">Brand:</span>
-                  <span>{product.brand}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="font-semibold">Category:</span>
                   <span>{product.category}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-semibold">Price:</span>
-                  <span className="text-2xl font-bold text-teal-prime">${product.price}</span>
                 </div>
               </div>
             </div>
@@ -190,30 +172,10 @@ const Products = () => {
             <div>
               <h3 className="text-lg font-semibold mb-3">Description</h3>
               <p className="text-gray-700 mb-4">{product.description}</p>
-              
-              <h3 className="text-lg font-semibold mb-3">Specifications</h3>
-              <div className="space-y-2">
-                {Object.entries(product.specifications || {}).map(([key, value]) => (
-                  <div key={key} className="flex justify-between border-b border-gray-200 pb-1">
-                    <span className="font-medium text-gray-600">{key}:</span>
-                    <span className="text-gray-900">{value}</span>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
           
-          <div className="flex justify-end space-x-4 mt-6 pt-6 border-t border-gray-200">
-            <button
-              onClick={onClose}
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Close
-            </button>
-            <button className="btn-primary">
-              Request Quote
-            </button>
-          </div>
+          
         </div>
       </motion.div>
     </motion.div>
@@ -281,18 +243,7 @@ const Products = () => {
               </select>
             </div>
 
-            {/* Brand Filter */}
-            <div>
-              <select
-                value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
-                className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-              >
-                {brands.map(brand => (
-                  <option key={brand} value={brand}>{brand}</option>
-                ))}
-              </select>
-            </div>
+            {/* Brand filter removed */}
 
             <div className="text-gray-600">
               {filteredProducts.length} products found
