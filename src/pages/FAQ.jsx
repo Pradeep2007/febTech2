@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronDown, FaChevronUp, FaQuestionCircle } from 'react-icons/fa';
+import { getFaqs } from '../services/faqService';
 
 const FAQ = () => {
   const [openItems, setOpenItems] = useState({});
+  const [faqs, setFaqs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const toggleItem = (index) => {
     setOpenItems(prev => ({
@@ -11,6 +14,56 @@ const FAQ = () => {
       [index]: !prev[index]
     }));
   };
+
+  useEffect(() => {
+    loadFaqs();
+  }, []);
+
+  const loadFaqs = async () => {
+    try {
+      setLoading(true);
+      const faqData = await getFaqs();
+      // Filter only active FAQs and group by category
+      const activeFaqs = faqData.filter(faq => faq.isActive);
+      
+      // Group FAQs by category
+      const groupedFaqs = activeFaqs.reduce((acc, faq) => {
+        if (!acc[faq.category]) {
+          acc[faq.category] = [];
+        }
+        acc[faq.category].push({
+          question: faq.question,
+          answer: faq.answer
+        });
+        return acc;
+      }, {});
+
+      // Convert to the format expected by the component
+      const faqCategories = Object.keys(groupedFaqs).map(category => ({
+        title: category,
+        faqs: groupedFaqs[category]
+      }));
+
+      setFaqs(faqCategories);
+    } catch (error) {
+      console.error('Error loading FAQs:', error);
+      // Fallback to empty array if Firebase fails
+      setFaqs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-light-gray flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading-spinner w-12 h-12 border-4 border-teal-prime border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading FAQs...</p>
+        </div>
+      </div>
+    );
+  }
 
   const faqCategories = [
     {
@@ -169,7 +222,7 @@ const FAQ = () => {
       <section className="section-padding bg-light-gray">
         <div className="container-max">
           <div className="max-w-4xl mx-auto">
-            {faqCategories.map((category, categoryIndex) => (
+            {faqs.map((category, categoryIndex) => (
               <motion.div
                 key={category.title}
                 initial={{ y: 50, opacity: 0 }}

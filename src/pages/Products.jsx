@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   FaFilter, 
@@ -72,8 +72,8 @@ const Products = () => {
     setFilteredProducts(filtered);
   };
 
-  const categories = ['All', ...new Set(products.map(p => p.category))];
-  const brands = ['All', ...new Set(products.map(p => p.brand))];
+  const categories = ['All', ...new Set(products.map(p => p.category))].filter(Boolean);
+  const brands = ['All', ...new Set(products.map(p => p.brand))].filter(Boolean);
 
   const ProductCard = ({ product }) => (
     <motion.div

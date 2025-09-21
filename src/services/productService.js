@@ -70,6 +70,7 @@ export const deleteProduct = async (productId) => {
 // Sample products data for initial setup
 export const sampleProducts = [
   {
+    id: 'sample-1',
     name: 'Digital Blood Pressure Monitor',
     category: 'Equipment',
     subcategory: 'Diagnostic Equipment',
@@ -89,6 +90,7 @@ export const sampleProducts = [
     image: '/api/placeholder/400/300'
   },
   {
+    id: 'sample-2',
     name: 'Automated Hematology Analyzer',
     category: 'Equipment',
     subcategory: 'Laboratory Equipment',
@@ -108,6 +110,7 @@ export const sampleProducts = [
     image: '/api/placeholder/400/300'
   },
   {
+    id: 'sample-3',
     name: 'Amoxicillin 500mg Capsules',
     category: 'Medicines',
     subcategory: 'Antibiotics',
@@ -127,6 +130,7 @@ export const sampleProducts = [
     image: '/api/placeholder/400/300'
   },
   {
+    id: 'sample-4',
     name: 'Surgical Gloves - Latex Free',
     category: 'Equipment',
     subcategory: 'Medical Supplies',
@@ -146,6 +150,7 @@ export const sampleProducts = [
     image: '/api/placeholder/400/300'
   },
   {
+    id: 'sample-5',
     name: 'Insulin Pen Needles',
     category: 'Equipment',
     subcategory: 'Medical Supplies',
@@ -165,6 +170,7 @@ export const sampleProducts = [
     image: '/api/placeholder/400/300'
   },
   {
+    id: 'sample-6',
     name: 'Metformin 850mg Tablets',
     category: 'Medicines',
     subcategory: 'Diabetes Care',

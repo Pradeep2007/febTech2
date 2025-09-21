@@ -14,8 +14,7 @@ import {
   FaSearch,
   FaShieldAlt,
   FaUsers,
-  FaAward,
-  FaSignOutAlt
+  FaAward
 } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -25,15 +24,9 @@ import {
   deleteProduct,
   sampleProducts 
 } from '../services/productService';
-import { 
-  getFaqs, 
-  addFaq, 
-  updateFaq, 
-  deleteFaq 
-} from '../services/faqService';
 
 const Admin = () => {
-  const { currentUser, isAdmin, login, logout } = useAuth();
+  const { currentUser, isAdmin, login } = useAuth();
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [faqs, setFaqs] = useState([]);
@@ -45,36 +38,54 @@ const Admin = () => {
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
+  // Sample FAQs data
+  const sampleFaqs = [
+    {
+      id: '1',
+      category: 'Order Process',
+      question: 'How do I place an order?',
+      answer: 'You can place orders through our online platform, by contacting your dedicated account manager, or by calling our customer service team at (555) 123-4567.',
+      isActive: true
+    },
+    {
+      id: '2',
+      category: 'Compliance',
+      question: 'Are all your products FDA approved?',
+      answer: 'All medical devices and pharmaceutical products we distribute are FDA approved or cleared, as applicable. We maintain current FDA registration and only work with manufacturers who meet all regulatory requirements.',
+      isActive: true
+    },
+    {
+      id: '3',
+      category: 'Shipping',
+      question: 'What are your shipping options?',
+      answer: 'We offer standard ground shipping, expedited delivery, next-day delivery, and same-day delivery in select markets. For temperature-sensitive products, we provide validated cold chain shipping.',
+      isActive: true
+    }
+  ];
+
   useEffect(() => {
     if (isAdmin) {
       loadData();
     }
   }, [isAdmin]);
 
-  // Initialize with empty FAQs array so you can add your own
-  const sampleFaqs = [];
-
   const loadData = async () => {
     try {
       setLoading(true);
-      
-      // Load products from Firebase
       let productData = await getProducts();
+      
+      // If no products in Firebase, use sample data
       if (productData.length === 0) {
         productData = sampleProducts;
       }
       
-      // Load FAQs from Firebase
-      let faqData = await getFaqs();
-      
-      console.log('Loading data - Products:', productData.length, 'FAQs:', faqData.length);
       setProducts(productData);
-      setFaqs(faqData);
+      setFaqs(sampleFaqs); // Initialize with sample FAQs
     } catch (error) {
       console.error('Error loading data:', error);
-      // Fallback to sample data for products, empty for FAQs
+      // Fallback to sample data
       setProducts(sampleProducts);
-      setFaqs([]);
+      setFaqs(sampleFaqs);
     } finally {
       setLoading(false);
     }
@@ -92,25 +103,13 @@ const Admin = () => {
     }
   };
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    product.brand.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const filteredFaqs = faqs.filter(faq =>
-    faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    faq.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  // Product handlers
   const handleAddProduct = () => {
     setEditingItem(null);
     setActiveTab('products');
     setShowModal(true);
     reset({
       name: '',
-      sku: '',
       category: 'Equipment',
       brand: 'Sysmax-Biosystems',
       price: '',
@@ -126,35 +125,22 @@ const Admin = () => {
     setShowModal(true);
     reset({
       name: product.name,
-      sku: product.sku,
       category: product.category,
       brand: product.brand,
       price: product.price,
-      stock: product.stock || product.stockQuantity || 0,
+      stock: product.stock || product.stockQuantity,
       description: product.description,
-      specifications: JSON.stringify(product.specifications || {}, null, 2)
+      specifications: JSON.stringify(product.specifications, null, 2)
     });
   };
 
-  const handleDeleteProduct = async (productId) => {
-    console.log('Deleting product with ID:', productId);
+  const handleDeleteProduct = (productId) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        setLoading(true);
-        await deleteProduct(productId);
-        // Reload data from Firebase
-        await loadData();
-        console.log('Product deleted successfully from Firebase');
-      } catch (error) {
-        console.error('Error deleting product:', error);
-        alert('Error deleting product: ' + error.message);
-      } finally {
-        setLoading(false);
-      }
+      setProducts(products.filter(p => p.id !== productId));
     }
   };
 
-
+  // FAQ handlers
   const handleAddFaq = () => {
     setEditingItem(null);
     setActiveTab('faqs');
@@ -179,97 +165,68 @@ const Admin = () => {
     });
   };
 
-  const handleDeleteFaq = async (faqId) => {
-    console.log('Deleting FAQ with ID:', faqId);
+  const handleDeleteFaq = (faqId) => {
     if (window.confirm('Are you sure you want to delete this FAQ?')) {
-      try {
-        setLoading(true);
-        await deleteFaq(faqId);
-        // Reload data from Firebase
-        await loadData();
-        console.log('FAQ deleted successfully from Firebase');
-      } catch (error) {
-        console.error('Error deleting FAQ:', error);
-        alert('Error deleting FAQ: ' + error.message);
-      } finally {
-        setLoading(false);
-      }
+      setFaqs(faqs.filter(f => f.id !== faqId));
     }
   };
 
-  const onSubmitFaq = async (data) => {
+  const onSubmitProduct = (data) => {
     try {
-      setLoading(true);
-      const faqData = {
-        category: data.category,
-        question: data.question,
-        answer: data.answer,
-        isActive: data.isActive === 'true' || data.isActive === true
-      };
-
-      if (editingItem) {
-        // Update existing FAQ in Firebase
-        await updateFaq(editingItem.id, faqData);
-        console.log('FAQ updated successfully in Firebase');
-      } else {
-        // Add new FAQ to Firebase
-        await addFaq(faqData);
-        console.log('FAQ added successfully to Firebase');
-      }
-
-      // Reload data from Firebase
-      await loadData();
-      setShowModal(false);
-      reset();
-    } catch (error) {
-      console.error('Error saving FAQ:', error);
-      alert('Error saving FAQ: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const onSubmitProduct = async (data) => {
-    try {
-      setLoading(true);
-      const stockValue = parseInt(data.stock) || 0;
       const productData = {
-        name: data.name,
-        sku: data.sku || `SKU-${Date.now()}`,
-        category: data.category,
-        brand: data.brand,
-        price: parseFloat(data.price) || 0,
-        stock: stockValue,
-        stockQuantity: stockValue,
-        inStock: stockValue > 0,
-        description: data.description,
-        specifications: JSON.parse(data.specifications || '{}')
+        ...data,
+        price: parseFloat(data.price),
+        stock: parseInt(data.stock),
+        stockQuantity: parseInt(data.stock),
+        inStock: parseInt(data.stock) > 0,
+        specifications: JSON.parse(data.specifications || '{}'),
+        id: editingItem ? editingItem.id : Date.now().toString()
       };
 
       if (editingItem) {
-        // Update existing product in Firebase
-        await updateProduct(editingItem.id, productData);
-        console.log('Product updated successfully in Firebase');
+        setProducts(products.map(p => p.id === editingItem.id ? productData : p));
       } else {
-        // Add new product to Firebase
-        await addProduct(productData);
-        console.log('Product added successfully to Firebase');
+        setProducts([...products, productData]);
       }
 
-      // Reload data from Firebase
-      await loadData();
       setShowModal(false);
       reset();
     } catch (error) {
-      console.error('Error saving product:', error);
       alert('Error saving product: ' + error.message);
-    } finally {
-      setLoading(false);
     }
   };
+
+  const onSubmitFaq = (data) => {
+    const faqData = {
+      ...data,
+      isActive: data.isActive === 'true' || data.isActive === true,
+      id: editingItem ? editingItem.id : Date.now().toString()
+    };
+
+    if (editingItem) {
+      setFaqs(faqs.map(f => f.id === editingItem.id ? faqData : f));
+    } else {
+      setFaqs([...faqs, faqData]);
+    }
+
+    setShowModal(false);
+    reset();
+  };
+
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.brand.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredFaqs = faqs.filter(faq =>
+    faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    faq.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   // Login Form Component
-  const LoginForm = () => {
+  if (showLoginForm) {
     const { register: loginRegister, handleSubmit: handleLoginSubmit } = useForm();
 
     return (
@@ -328,227 +285,43 @@ const Admin = () => {
         </motion.div>
       </div>
     );
-  };
+  }
 
-  // Product Form Modal
-  const ProductModal = () => (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-      >
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {editingProduct ? 'Edit Product' : 'Add New Product'}
-            </h2>
-            <button
-              onClick={() => setShowModal(false)}
-              className="text-gray-500 hover:text-gray-700 text-2xl"
-            >
-              <FaTimes />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Product Name *
-                </label>
-                <input
-                  type="text"
-                  {...register('name', { required: 'Product name is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  SKU *
-                </label>
-                <input
-                  type="text"
-                  {...register('sku', { required: 'SKU is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-                {errors.sku && <p className="text-red-500 text-sm mt-1">{errors.sku.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category *
-                </label>
-                <select
-                  {...register('category', { required: 'Category is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                >
-                  <option value="">Select Category</option>
-                  <option value="Equipment">Equipment</option>
-                  <option value="Medicines">Medicines</option>
-                </select>
-                {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Brand *
-                </label>
-                <select
-                  {...register('brand', { required: 'Brand is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                >
-                  <option value="">Select Brand</option>
-                  <option value="Sysmax-Biosystems">Sysmax-Biosystems</option>
-                  <option value="Rest Inc.">Rest Inc.</option>
-                </select>
-                {errors.brand && <p className="text-red-500 text-sm mt-1">{errors.brand.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price *
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  {...register('price', { required: 'Price is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-                {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Stock Quantity
-                </label>
-                <input
-                  type="number"
-                  {...register('stockQuantity')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subcategory
-                </label>
-                <input
-                  type="text"
-                  {...register('subcategory')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  In Stock
-                </label>
-                <select
-                  {...register('inStock')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                >
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                {...register('description')}
-                rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Specifications (JSON format)
-              </label>
-              <textarea
-                {...register('specifications')}
-                rows="4"
-                placeholder='{"key": "value", "key2": "value2"}'
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent font-mono text-sm"
-              />
-            </div>
-
-            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary flex items-center"
-              >
-                {loading ? (
-                  <div className="loading-spinner w-5 h-5 border-2 mr-2"></div>
-                ) : null}
-                {editingProduct ? 'Update Product' : 'Add Product'}
-              </button>
-            </div>
-          </form>
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-light-gray flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h2>
+          <p className="text-gray-600">You don't have permission to access this page.</p>
         </div>
-      </motion.div>
-    </motion.div>
-  );
-
-  if (showLoginForm || !isAdmin) {
-    return <LoginForm />;
+      </div>
+    );
   }
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.5 }}
       className="min-h-screen bg-light-gray"
     >
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="container-max py-6">
-          <div className="flex justify-between items-center">
+      <div className="container-max py-8">
+        {/* Header */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
               <p className="text-gray-600">Manage products and FAQs</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4 mt-4 md:mt-0">
               <div className="flex items-center text-green-600">
                 <FaUserShield className="mr-2" />
                 <span className="font-medium">{currentUser?.email}</span>
               </div>
-              <button
-                onClick={logout}
-                className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
-              >
-                <FaSignOutAlt />
-                <span>Logout</span>
-              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Tabs */}
-      <div className="container-max py-8">
+        {/* Tabs */}
         <div className="bg-white rounded-xl shadow-lg mb-8">
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8 px-6">

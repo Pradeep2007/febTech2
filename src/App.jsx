@@ -37,7 +37,12 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}
+      >
         <div className="App min-h-screen bg-light-gray">
           <Navbar />
           <AnimatePresence mode="wait">

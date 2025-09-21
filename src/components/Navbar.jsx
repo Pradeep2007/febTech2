@@ -60,32 +60,6 @@ const Navbar = () => {
                 )}
               </Link>
             ))}
-            
-            {/* Admin Section */}
-            {isAdmin ? (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/admin"
-                  className="flex items-center space-x-2 bg-orange text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
-                >
-                  <FaUserShield />
-                  <span>Admin</span>
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="text-gray-700 hover:text-red-500 transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/admin"
-                className="text-gray-700 hover:text-teal-prime transition-colors"
-              >
-                Admin Login
-              </Link>
-            )}
           </div>
 
           {/* Mobile menu button */}
@@ -118,36 +92,6 @@ const Navbar = () => {
                 {item.name}
               </Link>
             ))}
-            
-            {isAdmin ? (
-              <div className="space-y-2">
-                <Link
-                  to="/admin"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center space-x-2 text-orange hover:text-orange-600 transition-colors"
-                >
-                  <FaUserShield />
-                  <span>Admin Dashboard</span>
-                </Link>
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setIsOpen(false);
-                  }}
-                  className="block text-gray-700 hover:text-red-500 transition-colors"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/admin"
-                onClick={() => setIsOpen(false)}
-                className="block text-gray-700 hover:text-teal-prime transition-colors"
-              >
-                Admin Login
-              </Link>
-            )}
           </div>
         </motion.div>
       </div>
