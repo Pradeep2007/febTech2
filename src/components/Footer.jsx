@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaLinkedin, FaTwitter, FaFacebook } from 'react-icons/fa';
+import logo1 from '../assets/images/logo1.png';
 
 const Footer = () => {
   return (
@@ -8,11 +9,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-10 h-10 bg-teal-prime rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">FT</span>
-              </div>
-              <span className="text-2xl font-bold">FabTech</span>
+            <div className="flex items-center mb-4">
+              <img src={logo1} alt="FabTech Logo" className="h-12 w-auto" />
             </div>
             <p className="text-gray-400 mb-4">
               Leading provider of medical equipment and pharmaceutical products with 
@@ -60,12 +58,12 @@ const Footer = () => {
 
           {/* Services */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Services</h3>
+            <h3 className="text-lg font-semibold mb-4">Products</h3>
             <ul className="space-y-2">
               <li className="text-gray-400">Medical Equipment</li>
               <li className="text-gray-400">Pharmaceutical Products</li>
-              <li className="text-gray-400">Compliance Consulting</li>
-              <li className="text-gray-400">Supply Chain Management</li>
+              {/* <li className="text-gray-400">Compliance Consulting</li> */}
+              {/* <li className="text-gray-400">Supply Chain Management</li> */}
             </ul>
           </div>
 

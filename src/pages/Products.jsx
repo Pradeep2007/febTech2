@@ -4,7 +4,9 @@ import {
   FaFilter, 
   FaSearch, 
   FaInfoCircle,
-  FaTimes
+  FaTimes,
+  FaDownload,
+  FaFileAlt
 } from 'react-icons/fa';
 import { getProducts, sampleProducts } from '../services/productService';
 
@@ -114,14 +116,32 @@ const Products = () => {
           </div>
         )}
 
-        {/* CTA full width */}
-        <button
-          onClick={() => setSelectedProduct(product)}
-          className="w-full inline-flex items-center justify-center gap-2 rounded-lg text-sm px-4 py-2.5 text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 transition-colors shadow"
-        >
-          <FaInfoCircle />
-          Details
-        </button>
+        {/* CTA buttons */}
+        <div className="space-y-2">
+          <button
+            onClick={() => setSelectedProduct(product)}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-lg text-sm px-4 py-2.5 text-white bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 transition-colors shadow"
+          >
+            <FaInfoCircle />
+            Details
+          </button>
+          
+          {/* Brochure download button */}
+          {product.hasBrochure && product.brochureBase64Data && (
+            <button
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = product.brochureBase64Data;
+                link.download = product.brochureFileName || 'brochure';
+                link.click();
+              }}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg text-sm px-4 py-2.5 text-teal-600 bg-teal-50 hover:bg-teal-100 border border-teal-200 hover:border-teal-300 transition-colors"
+            >
+              <FaDownload />
+              Download Brochure
+            </button>
+          )}
+        </div>
       </div>
     </motion.div>
   );
@@ -273,6 +293,7 @@ const Products = () => {
           )}
         </div>
       </section>
+
 
       {/* Product Modal */}
       {selectedProduct && (

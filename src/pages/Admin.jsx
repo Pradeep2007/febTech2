@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { useAuth } from '../context/AuthContext';
+import { toast, ToastContainer } from '../components/Toast';
 import { 
   FaPlus, 
   FaEdit, 
@@ -15,9 +17,11 @@ import {
   FaShieldAlt,
   FaUsers,
   FaAward,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaFileAlt,
+  FaUpload,
+  FaDownload
 } from 'react-icons/fa';
-import { useAuth } from '../context/AuthContext';
 import { 
   getProducts, 
   addProduct, 
@@ -31,6 +35,10 @@ import {
   updateFaq, 
   deleteFaq 
 } from '../services/faqService';
+import {
+  fileToBase64,
+  validateBrochureFile
+} from '../services/brochureService';
 
 const Admin = () => {
   const { currentUser, isAdmin, login, logout } = useAuth();
@@ -85,8 +93,10 @@ const Admin = () => {
       setLoading(true);
       await login(data.email, data.password);
       setShowLoginForm(false);
+      toast.success('Login successful! Welcome to admin dashboard.');
     } catch (error) {
-      alert('Login failed: ' + error.message);
+      console.error('Login error:', error);
+      toast.error('Login failed: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -103,6 +113,7 @@ const Admin = () => {
     faq.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
 
   const handleAddProduct = () => {
     setEditingItem(null);
@@ -142,12 +153,12 @@ const Admin = () => {
       try {
         setLoading(true);
         await deleteProduct(productId);
-        // Reload data from Firebase
         await loadData();
-        console.log('Product deleted successfully from Firebase');
+        toast.success('Product deleted successfully!');
+        console.log('Product deleted successfully');
       } catch (error) {
         console.error('Error deleting product:', error);
-        alert('Error deleting product: ' + error.message);
+        toast.error('Error deleting product: ' + error.message);
       } finally {
         setLoading(false);
       }
@@ -185,12 +196,12 @@ const Admin = () => {
       try {
         setLoading(true);
         await deleteFaq(faqId);
-        // Reload data from Firebase
         await loadData();
-        console.log('FAQ deleted successfully from Firebase');
+        toast.success('FAQ deleted successfully!');
+        console.log('FAQ deleted successfully');
       } catch (error) {
         console.error('Error deleting FAQ:', error);
-        alert('Error deleting FAQ: ' + error.message);
+        toast.error('Error deleting FAQ: ' + error.message);
       } finally {
         setLoading(false);
       }
@@ -210,20 +221,18 @@ const Admin = () => {
       if (editingItem) {
         // Update existing FAQ in Firebase
         await updateFaq(editingItem.id, faqData);
-        console.log('FAQ updated successfully in Firebase');
+        toast.success('FAQ updated successfully!');
       } else {
-        // Add new FAQ to Firebase
         await addFaq(faqData);
-        console.log('FAQ added successfully to Firebase');
+        toast.success('FAQ added successfully!');
       }
-
-      // Reload data from Firebase
+      
       await loadData();
       setShowModal(false);
       reset();
     } catch (error) {
       console.error('Error saving FAQ:', error);
-      alert('Error saving FAQ: ' + error.message);
+      toast.error('Error saving FAQ: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -233,26 +242,93 @@ const Admin = () => {
     try {
       setLoading(true);
       const stockValue = parseInt(data.stock) || 0;
+      
+      // Handle brochure upload
+      const fileInput = document.getElementById('brochure-file-input');
+      const file = fileInput?.files[0];
+      let brochureData = null;
+      
+      console.log('File input found:', !!fileInput);
+      console.log('File selected:', !!file);
+      if (file) {
+        console.log('File details:', {
+          name: file.name,
+          size: file.size,
+          type: file.type
+        });
+      }
+      
+      if (file) {
+        try {
+          // Validate file
+          validateBrochureFile(file);
+          
+          // Check file size (1MB = 1,048,576 bytes, but base64 adds ~33% overhead)
+          const maxSize = 750000; // ~750KB to account for base64 overhead
+          if (file.size > maxSize) {
+            toast.error(`File too large! Maximum size is ${Math.round(maxSize/1024)}KB. Your file is ${Math.round(file.size/1024)}KB. Please compress the file.`);
+            return;
+          }
+          
+          // Convert to base64
+          const base64Data = await fileToBase64(file);
+          
+          brochureData = {
+            fileName: file.name,
+            fileType: file.type,
+            fileSize: file.size,
+            base64Data: base64Data,
+            uploadedAt: new Date().toISOString()
+          };
+        } catch (fileError) {
+          toast.error('Error processing brochure: ' + fileError.message);
+          return;
+        }
+      }
+      
       const productData = {
         name: data.name,
         sku: data.sku || `SKU-${Date.now()}`,
         category: data.category,
-        brand: data.brand,
+        brand: data.brand || '',
         price: parseFloat(data.price) || 0,
         stock: stockValue,
         stockQuantity: stockValue,
         inStock: stockValue > 0,
         description: data.description,
-        specifications: JSON.parse(data.specifications || '{}')
+        specifications: data.specifications ? JSON.parse(data.specifications) : {},
+        // Flatten brochure data to avoid nested object issues
+        brochureFileName: brochureData?.fileName || null,
+        brochureFileType: brochureData?.fileType || null,
+        brochureFileSize: brochureData?.fileSize || null,
+        brochureBase64Data: brochureData?.base64Data || null,
+        brochureUploadedAt: brochureData?.uploadedAt || null,
+        hasBrochure: !!brochureData
       };
 
+      console.log('Product data to save:', {
+        ...productData,
+        brochureBase64Data: brochureData?.base64Data ? `${brochureData.base64Data.substring(0, 50)}...` : null
+      });
+
       if (editingItem) {
+        // If no new file uploaded, keep existing brochure data
+        if (!file && editingItem.hasBrochure) {
+          productData.brochureFileName = editingItem.brochureFileName;
+          productData.brochureFileType = editingItem.brochureFileType;
+          productData.brochureFileSize = editingItem.brochureFileSize;
+          productData.brochureBase64Data = editingItem.brochureBase64Data;
+          productData.brochureUploadedAt = editingItem.brochureUploadedAt;
+          productData.hasBrochure = true;
+        }
         // Update existing product in Firebase
         await updateProduct(editingItem.id, productData);
+        toast.success('Product updated successfully!');
         console.log('Product updated successfully in Firebase');
       } else {
         // Add new product to Firebase
         await addProduct(productData);
+        toast.success('Product added successfully!');
         console.log('Product added successfully to Firebase');
       }
 
@@ -262,11 +338,12 @@ const Admin = () => {
       reset();
     } catch (error) {
       console.error('Error saving product:', error);
-      alert('Error saving product: ' + error.message);
+      toast.error('Error saving product: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
+
 
   // Login Form Component
   const LoginForm = () => {
@@ -720,6 +797,7 @@ const Admin = () => {
                 ))}
               </div>
             )}
+
           </div>
         </div>
       </div>
@@ -835,6 +913,21 @@ const Admin = () => {
                     />
                   </div>
 
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Product Brochure (PDF, JPG, PNG - Max 750KB)
+                    </label>
+                    <input
+                      id="brochure-file-input"
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                    />
+                    <p className="text-gray-500 text-xs mt-1">
+                      Upload a brochure for this product. Supported formats: PDF, JPEG, PNG. Maximum file size: 750KB (due to Firestore limitations)
+                    </p>
+                  </div>
+
                   {/* <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Specifications (JSON format)
@@ -935,6 +1028,20 @@ const Admin = () => {
           </motion.div>
         </div>
       )}
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </motion.div>
   );
 };
