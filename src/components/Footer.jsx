@@ -14,7 +14,7 @@ const Footer = () => {
             </div>
             <p className="text-gray-400 mb-4">
               Leading provider of medical equipment and pharmaceutical products with 
-              compliance and quality assurance since 2010.
+              compliance and quality assurance since 2011.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-teal-prime transition-colors">
@@ -39,13 +39,13 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/products" className="text-gray-400 hover:text-teal-prime transition-colors">
-                  Products
+                <Link to="/members" className="text-gray-400 hover:text-teal-prime transition-colors">
+                  Members
                 </Link>
               </li>
               <li>
-                <Link to="/members" className="text-gray-400 hover:text-teal-prime transition-colors">
-                  Members
+                <Link to="/products" className="text-gray-400 hover:text-teal-prime transition-colors">
+                  Products
                 </Link>
               </li>
               <li>
@@ -93,7 +93,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2024 FabTech. All rights reserved.
+            © 2025 FabTech. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-gray-400 hover:text-teal-prime text-sm transition-colors">

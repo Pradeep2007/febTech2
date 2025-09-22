@@ -909,7 +909,7 @@ const Admin = () => {
                     >
                       <option value="Order Process">Order Process</option>
                       <option value="Support">Support</option>
-                      <option value="Returns">Product Category</option>
+                      <option value="Product Category">Product Category</option>
                     </select>
                   </div>
 

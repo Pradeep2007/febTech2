@@ -12,14 +12,14 @@ const Navbar = () => {
   const { isAdmin, logout } = useAuth();
 
   // Define sections for scroll spy (only on home page)
-  const sectionIds = ['home', 'about', 'products', 'members', 'clients', 'faq', 'contact'];
+  const sectionIds = ['home', 'about', 'members', 'products', 'clients', 'faq', 'contact'];
   const activeSection = useScrollSpy(sectionIds, 150);
 
   const navItems = [
     { name: 'Home', path: '/', sectionId: 'home' },
     { name: 'About', path: '/about', sectionId: 'about' },
-    { name: 'Products', path: '/products', sectionId: 'products' },
     { name: 'Members', path: '/members', sectionId: 'members' },
+    { name: 'Products', path: '/products', sectionId: 'products' },
     { name: 'Clients', path: '/clients', sectionId: 'clients' },
     { name: 'FAQ', path: '/faq', sectionId: 'faq' },
     { name: 'Contact', path: '/contact', sectionId: 'contact' },

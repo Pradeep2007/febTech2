@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import PratikOzaImage from '../assets/images/Pratik.jpg';
 import { 
   FaCalendarAlt, 
   FaEye, 
@@ -162,10 +163,7 @@ const About = () => {
           >
             <h1 className="text-5xl font-bold mb-6">About Fabtech Inc</h1>
             <p className="text-xl text-light-teal max-w-4xl mx-auto leading-relaxed">
-              Fabtech Inc delivers trust and innovation as a leading sales, service, and distribution 
-              partner for hospitals, laboratories, and medical device companies. Headquartered in 
-              Ahmedabad, Gujarat, we specialize in medical equipment, hospital equipment, surgical 
-              equipment, biomedical equipment, diagnostic devices, and medical supplies.
+            Fabtech Inc is an innovation-led, trusted partner for sales, service, and distribution across hospitals, laboratories, and medical device organizations. Based in Ahmedabad, Gujarat, our focus spans medical and hospital equipment, surgical and biomedical systems, diagnostic technologies, and essential medical supplies. Featuring solutions from Abbott and other world-class manufacturers, we are the preferred choice for healthcare institutions that prioritize reliability and excellence. And we don’t stop at distribution—our dedicated service network and customer-first approach ensure every biomedical and surgical device performs to international standards, because in healthcare, precision and trust save lives.
             </p>
             <div className="mt-8">
               <span className="inline-block bg-white bg-opacity-20 px-6 py-2 rounded-full text-lg font-medium">
@@ -177,8 +175,7 @@ const About = () => {
       </section>
 
       {/* Who We Are Section */}
-      <section className="section-padding bg-gradient-to-br from-white to-cyan-50 relative overflow-hidden">
-        {/* Subtle sunlight wash */}
+      {/* <section className="section-padding bg-gradient-to-br from-white to-cyan-50 relative overflow-hidden">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute -top-16 right-0 w-[26rem] h-[26rem] blur-3xl opacity-40"
@@ -261,6 +258,83 @@ const About = () => {
             </motion.div>
           </div>
         </div>
+      </section> */}
+
+      {/* Mission & Vision */}
+      <section className="section-padding bg-gradient-to-br from-indigo-50 to-purple-50">
+        <div className="container-max">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              whileHover={{ 
+                scale: 1.01,
+                y: -5,
+                transition: { 
+                  duration: 0.3, 
+                  ease: [0.4, 0, 0.2, 1],
+                  type: "tween"
+                }
+              }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="card p-8 bg-gradient-to-br from-indigo-100 to-purple-100 border border-indigo-200 shadow-lg hover:shadow-2xl transition-all duration-300 hover:from-indigo-200 hover:to-purple-200 transform-gpu"
+            >
+              <motion.div 
+                className="text-center mb-6"
+                whileHover={{ 
+                  scale: 1.08,
+                  transition: { 
+                    duration: 0.25,
+                    ease: [0.4, 0, 0.2, 1],
+                    type: "tween"
+                  }
+                }}
+              >
+                <FaEye className="text-6xl text-indigo-600 mx-auto mb-4" />
+              </motion.div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4 text-center">Vision Statement</h3>
+              <p className="text-gray-700 text-lg leading-relaxed text-center">
+              Fabtech Inc aims to shape the future of healthcare by delivering innovative medical technology for better patient care. Our vision is to set new benchmarks in excellence, lead the industry, and create sustainable solutions that empower healthcare providers worldwide.
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              whileHover={{ 
+                scale: 1.01,
+                y: -5,
+                transition: { 
+                  duration: 0.3, 
+                  ease: [0.4, 0, 0.2, 1],
+                  type: "tween"
+                }
+              }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="card p-8 bg-gradient-to-br from-teal-100 to-emerald-100 border border-teal-200 shadow-lg hover:shadow-2xl transition-all duration-300 hover:from-teal-200 hover:to-emerald-200 transform-gpu"
+            >
+              <motion.div 
+                className="text-center mb-6"
+                whileHover={{ 
+                  scale: 1.08,
+                  transition: { 
+                    duration: 0.25,
+                    ease: [0.4, 0, 0.2, 1],
+                    type: "tween"
+                  }
+                }}
+              >
+                <FaBullseye className="text-6xl text-teal-600 mx-auto mb-4" />
+              </motion.div>
+              <h3 className="text-3xl font-bold text-gray-900 mb-4 text-center">Mission Statement</h3>
+              <p className="text-gray-700 text-lg leading-relaxed text-center">
+              Our mission is to advance healthcare by providing innovative, reliable medical technology that improves diagnostics, treatment, and patient outcomes while supporting healthcare professionals worldwide.
+              </p>
+            </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* What We Deliver Section */}
@@ -327,7 +401,7 @@ const About = () => {
             />
 
             {/* Gradient border wrapper */}
-            <div className="p-[2px] rounded-2xl bg-gradient-to-r from-blue-400 via-teal-400 to-indigo-400">
+            {/* <div className="p-[2px] rounded-2xl bg-gradient-to-r from-blue-400 via-teal-400 to-indigo-400">
               <div className="card rounded-2xl p-10 text-center bg-white/90 backdrop-blur">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-sm font-medium mb-3">
                   <span className="w-2 h-2 rounded-full bg-blue-500"></span>
@@ -340,8 +414,6 @@ const About = () => {
                   We maintain strategic partnerships with Abbott and other world-renowned medical device companies,
                   ensuring access to the latest innovations in healthcare technology.
                 </p>
-
-                {/* Partner chips */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-8">
                   <div className="flex items-center justify-center gap-3 bg-gray-50 rounded-xl py-3 px-4 border border-gray-100">
                     <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-semibold">A</div>
@@ -376,139 +448,16 @@ const About = () => {
                   </span>
                 </div>
               </div>
-            </div>
+            </div> */}
           </motion.div>
         </div>
       </section>
 
-      {/* Why Fabtech Inc Section */}
-      <section className="section-padding bg-gradient-to-br from-white to-emerald-50">
-        <div className="container-max">
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-emerald-700 to-teal-600 bg-clip-text text-transparent mb-4">
-              Why Fabtech Inc
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Your trusted healthcare partner with proven excellence and unwavering commitment
-            </p>
-          </motion.div>
+      {/* Removed: Why Fabtech Inc Section */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {whyChooseUs.map((item, index) => (
-              <motion.div
-                key={item.title}
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="card p-8 hover:shadow-xl transition-transform transform hover:-translate-y-1 bg-white/90 backdrop-blur border-l-4 border-emerald-300"
-              >
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0">{item.icon}</div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                      {item.title}
-                    </h3>
-                    <p className="text-gray-700">{item.description}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
-      {/* Mission & Vision */}
-      <section className="section-padding bg-gradient-to-br from-indigo-50 to-purple-50">
-        <div className="container-max">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="card p-8 bg-white/90 backdrop-blur border border-indigo-100"
-            >
-              <FaEye className="text-4xl text-blue mb-6" />
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-indigo-700 to-purple-700 bg-clip-text text-transparent mb-4">🌟 Vision Statement</h3>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                Fabtech Inc envisions shaping the future of healthcare by driving global health 
-                innovation and delivering leading medical technology that ensures better patient 
-                care for all. Our vision is to set new benchmarks in healthcare excellence, 
-                establish industry leadership, and create sustainable healthcare solutions that 
-                empower healthcare providers worldwide.
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="card p-8 bg-white/90 backdrop-blur border border-purple-100"
-            >
-              <FaBullseye className="text-4xl text-teal-prime mb-6" />
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-teal-700 to-emerald-700 bg-clip-text text-transparent mb-4">🎯 Mission Statement</h3>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                Our mission is to be a leading medical equipment provider committed to improving 
-                quality of life through advanced medical technology. At Fabtech Inc, we focus on 
-                patient care by delivering innovative healthcare solutions that enhance diagnostics, 
-                treatment, and research. We are dedicated to supporting healthcare professionals 
-                with reliable, accessible medical equipment that contributes to enhancing patient 
-                outcomes and strengthening the healthcare ecosystem.
-              </p>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Core Values */}
-      <section className="section-padding bg-gradient-to-br from-white to-rose-50">
-        <div className="container-max">
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-rose-700 via-pink-700 to-fuchsia-700 bg-clip-text text-transparent mb-4">🏆 Core Values</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              At Fabtech Inc, our values are the foundation of our promise to customers, 
-              partners, and communities
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {coreValues.map((value, index) => (
-              <motion.div
-                key={value.title}
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="card p-6 hover:shadow-xl transition-transform transform hover:-translate-y-1 bg-white/90 backdrop-blur border-r-4 border-rose-300"
-              >
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 mt-1">{value.icon}</div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                      {value.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{value.description}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Removed: Core Values */}
 
       {/* Company Timeline */}
       <section className="section-padding bg-gradient-to-br from-sky-50 to-teal-50">
@@ -520,28 +469,58 @@ const About = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold bg-gradient-to-r from-teal-700 to-sky-700 bg-clip-text text-transparent mb-4">📈 Our Journey</h2>
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <FaChartLine className="text-4xl text-teal-600" />
+              <h2 className="text-4xl font-bold bg-gradient-to-r from-teal-700 to-sky-700 bg-clip-text text-transparent">Our Journey</h2>
+            </div>
             <p className="text-xl text-gray-600">
               Building on 25+ years of expertise in diagnostics and biomedical equipment industry
             </p>
           </motion.div>
           
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-            className="card p-8 mt-2 max-w-5xl mx-auto bg-white/90 backdrop-blur border border-teal-100"
-          >
-            <div className="prose max-w-none">
-              <p className="text-gray-700 text-lg leading-relaxed mb-4">
-                Our Journey Fabtech Inc was established in 2011, built on over 25 years of expertise in the diagnostics and biomedical equipment industry. Our leadership began with renowned names such as Transasia Biomedical Ltd. and Abbott Diagnostics, where our team consistently earned prestigious recognitions including the President’s Club, 100% Club, and Top Achievers awards.
-              </p>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                From day one, we have cultivated strong, long-term relationships with premium hospitals, clinical research organizations, and advanced pathology laboratories across Gujarat. These partnerships reflect our reputation as a reliable distributor trusted by both global medical device companies and leading healthcare providers.
-              </p>
-            </div>
-          </motion.div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            {/* Journey Content */}
+            <motion.div
+              initial={{ x: -50, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="card p-8 bg-white/90 backdrop-blur border border-teal-100"
+            >
+              <div className="prose max-w-none">
+                <p className="text-gray-700 text-lg leading-relaxed mb-4">
+                  Our Journey Fabtech Inc was established in 2011, built on over 25 years of expertise in the diagnostics and biomedical equipment industry. Our leadership began with renowned names such as Transasia Biomedical Ltd. and Abbott Diagnostics, where our team consistently earned prestigious recognitions including the President's Club, 100% Club, and Top Achievers awards.
+                </p>
+                <p className="text-gray-700 text-lg leading-relaxed">
+                  From day one, we have cultivated strong, long-term relationships with premium hospitals, clinical research organizations, and advanced pathology laboratories across Gujarat. These partnerships reflect our reputation as a reliable distributor trusted by both global medical device companies and leading healthcare providers.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Founder Card */}
+            <motion.div
+              initial={{ x: 50, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="card p-8 bg-gradient-to-br from-teal-50 to-sky-50 border border-teal-200 hover:shadow-xl transition-shadow duration-300 h-full"
+            >
+              <div className="flex flex-col items-center justify-center text-center h-full">
+                <div className="relative mb-8">
+                  <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-teal-200 shadow-lg">
+                    <img 
+                      src={PratikOzaImage} 
+                      alt="Pratik Oza - Founder & Director" 
+                      className="w-full h-full object-cover object-top"
+                    />
+                  </div>
+                </div>
+                
+                <h3 className="text-3xl font-bold text-gray-900 mb-3">Pratik Oza</h3>
+                <p className="text-teal-700 font-semibold text-xl">Founder & Director</p>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
     </motion.div>

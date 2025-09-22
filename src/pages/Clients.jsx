@@ -1,4 +1,13 @@
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
+import { useRef, useEffect, useState } from 'react';
+import client1 from '../assets/images/client1.jpg'
+import client2 from '../assets/images/client2.jpg'
+import client3 from '../assets/images/client3.jpg'
+import client4 from '../assets/images/client4.jpg'
+import client5 from '../assets/images/client5.png'
+import client6 from '../assets/images/client6.png'
+import client7 from '../assets/images/client7.jpg'
+import client8 from '../assets/images/client8.png'
 import { 
   FaHospital, 
   FaFlask, 
@@ -11,80 +20,146 @@ import {
 } from 'react-icons/fa';
 
 const Clients = () => {
-  const clients = [
-    {
-      name: 'Government Medical College',
-      category: 'Government',
-      type: 'Medical Education Institution',
-      location: 'Gujarat, India',
-      partnership: '8+ years',
-      description: 'Leading government medical college providing quality medical education and healthcare services',
-      services: ['Medical Equipment', 'Laboratory Instruments', 'Educational Tools'],
-      icon: <FaHospital className="text-3xl text-blue-600" />,
+  // Animated counter hook
+  const useAnimatedCounter = (end, duration = 2000, startAnimation = false) => {
+    const [count, setCount] = useState(0);
+    
+    useEffect(() => {
+      if (!startAnimation) return;
+      
+      let startTime;
+      const animate = (timestamp) => {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        
+        // Extract number from string (e.g., "10+" -> 10)
+        const numericEnd = parseInt(end.toString().replace(/[^0-9]/g, ''));
+        const currentCount = Math.floor(progress * numericEnd);
+        
+        setCount(currentCount);
+        
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          // Set final value with original formatting
+          setCount(end);
+        }
+      };
+      
+      requestAnimationFrame(animate);
+    }, [end, duration, startAnimation]);
+    
+    return count;
+  };
+
+  // Animated Stats Component
+  const AnimatedStats = () => {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, threshold: 0.3 });
+    
+    const stats = [
+      { number: '10+', label: 'Major Clients', color: 'text-blue-600' },
+      { number: '25+', label: 'Years Experience', color: 'text-green-600' },
+      { number: '100%', label: 'Client Satisfaction', color: 'text-purple-600' },
+      { number: '24/7', label: 'Support Available', color: 'text-orange-600' }
+    ];
+    
+    const count1 = useAnimatedCounter('10+', 2000, isInView);
+    const count2 = useAnimatedCounter('25+', 2500, isInView);
+    const count3 = useAnimatedCounter('100%', 3000, isInView);
+    const count4 = useAnimatedCounter('24/7', 2000, isInView);
+    
+    const animatedCounts = [count1, count2, count3, count4];
+    
+    return (
+      <motion.div
+        ref={ref}
+        initial={{ y: 50, opacity: 0 }}
+        whileInView={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        viewport={{ once: true }}
+        className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center"
+      >
+        {stats.map((stat, index) => (
+          <motion.div
+            key={stat.label}
+            initial={{ scale: 0.5, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+            viewport={{ once: true }}
+            className="space-y-2"
+          >
+            <div className={`text-4xl font-bold ${stat.color} transition-all duration-300`}>
+              {animatedCounts[index]}
+            </div>
+            <div className="text-gray-600">{stat.label}</div>
+          </motion.div>
+        ))}
+      </motion.div>
+    );
+  };
+  const partnerCategories = {
+    'Government': {
+      title: 'Government Institutions',
+      icon: <FaHospital className="text-4xl text-blue-600" />,
       color: 'blue',
-      achievements: ['500+ Students', 'Research Excellence', 'Community Healthcare']
+      partners: [
+        {
+          name: 'Civil Hospital Amdabad',
+          logo: client1
+        },
+        {
+          name: 'U.N. Mehta Institute of Cardiology and Research Center',
+          logo: client6
+        },
+        {
+          name: 'Government Medical College, Bhavnagar',
+          logo: client8
+        }
+      ]
     },
-    {
-      name: 'Shalby Multi-Specialty Care',
-      category: 'Corporate Hospitals',
-      type: 'Multi-Specialty Hospital Chain',
-      location: 'Ahmedabad, Gujarat',
-      partnership: '6+ years',
-      description: 'Premier healthcare provider known for advanced medical treatments and patient care',
-      services: ['Advanced Medical Equipment', 'Surgical Instruments', 'Diagnostic Tools'],
-      icon: <FaHeartbeat className="text-3xl text-red-500" />,
-      color: 'red',
-      achievements: ['Joint Replacement Leader', 'International Standards', 'Patient Satisfaction']
-    },
-    {
-      name: 'Zydus Healthcare',
-      category: 'Pharma Companies',
-      type: 'Pharmaceutical Giant',
-      location: 'Ahmedabad, Gujarat',
-      partnership: '10+ years',
-      description: 'Global pharmaceutical company focused on innovative healthcare solutions',
-      services: ['Pharmaceutical Equipment', 'Quality Control Instruments', 'Research Tools'],
-      icon: <FaPills className="text-3xl text-green-600" />,
-      color: 'green',
-      achievements: ['Global Presence', 'R&D Excellence', 'Quality Manufacturing']
-    },
-    {
-      name: 'Sanjeevani Pathology Laboratory',
-      category: 'Corporate Hospitals',
-      type: 'Diagnostic Laboratory Chain',
-      location: 'Gujarat, India',
-      partnership: '7+ years',
-      description: 'Leading pathology laboratory providing accurate diagnostic services',
-      services: ['Laboratory Equipment', 'Diagnostic Instruments', 'Quality Reagents'],
-      icon: <FaMicroscope className="text-3xl text-purple-600" />,
-      color: 'purple',
-      achievements: ['Accurate Diagnostics', 'Quick Turnaround', 'Advanced Technology']
-    },
-    {
-      name: 'Clianthra Clinical Research',
-      category: 'Clinical Research',
-      type: 'Clinical Research Organization',
-      location: 'Ahmedabad, Gujarat',
-      partnership: '5+ years',
-      description: 'Specialized clinical research organization conducting innovative medical studies',
-      services: ['Research Equipment', 'Clinical Trial Supplies', 'Data Management Tools'],
-      icon: <FaFlask className="text-3xl text-teal-600" />,
+    'Clinical Research': {
+      title: 'Clinical Research Organizations',
+      icon: <FaFlask className="text-4xl text-teal-600" />,
       color: 'teal',
-      achievements: ['Clinical Excellence', 'Research Innovation', 'Regulatory Compliance']
+      partners: [
+        {
+          name: 'Cliantha Clinical Research',
+          logo: client3
+        },
+        {
+          name: 'Lambda Research Accelerated',
+          logo: client5
+        }
+      ]
     },
-    {
-      name: 'Torrent Pharmaceuticals',
-      category: 'Pharma Companies',
-      type: 'Pharmaceutical Company',
-      location: 'Ahmedabad, Gujarat',
-      partnership: '12+ years',
-      description: 'Leading pharmaceutical company with global operations and innovative products',
-      services: ['Manufacturing Equipment', 'Quality Testing Instruments', 'Compliance Solutions'],
-      icon: <FaAward className="text-3xl text-orange-600" />,
-      color: 'orange',
-      achievements: ['Global Operations', 'Quality Excellence', 'Innovation Leader']
+    'Corporate Hospitals': {
+      title: 'Corporate Hospitals & Private Labs',
+      icon: <FaHeartbeat className="text-4xl text-red-500" />,
+      color: 'red',
+      partners: [
+        {
+          name: 'Shalby Multi-Specialty Care',
+          logo: client7
+        },
+        {
+          name: 'Sanjeevani Pathology Laboratory',
+          logo: client2
+        }
+      ]
+    },
+    'Pharma Companies': {
+      title: 'Pharmaceutical Companies',
+      icon: <FaPills className="text-4xl text-green-600" />,
+      color: 'green',
+      partners: [
+        {
+          name: 'Intas Pharmaceuticals',
+          logo: client4
+        }
+      ]
     }
-  ];
+  };
 
   const testimonials = [
     {
@@ -202,7 +277,7 @@ const Clients = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl font-bold mb-6">Our Valued Clients</h1>
+            <h1 className="text-5xl font-bold mb-6">Authorized Channel Partner</h1>
             <p className="text-xl text-light-teal max-w-3xl mx-auto">
               Trusted partnerships with leading healthcare institutions, pharmaceutical companies, 
               and research organizations across Gujarat and beyond.
@@ -211,7 +286,7 @@ const Clients = () => {
         </div>
       </section>
 
-      {/* Clients Grid */}
+      {/* Partner Categories */}
       <section className="section-padding bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="container-max">
           <motion.div
@@ -222,95 +297,70 @@ const Clients = () => {
             className="text-center mb-16"
           >
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Trusted by Industry Leaders
+              Our Trusted Partners
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              From government institutions to private hospitals, pharmaceutical giants to research organizations - 
-              our clients represent the best in healthcare.
+              Building strong partnerships across four key healthcare sectors in Gujarat and beyond.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-            {clients.map((client, index) => (
+          {/* Categories */}
+          <div className="space-y-16">
+            {Object.entries(partnerCategories).map(([categoryKey, category], categoryIndex) => (
               <motion.div
-                key={client.name}
-                initial={{ y: 50, opacity: 0, scale: 0.9 }}
-                whileInView={{ y: 0, opacity: 1, scale: 1 }}
-                whileHover={{ y: -10, scale: 1.02 }}
-                transition={{ 
-                  duration: 0.6, 
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 100
-                }}
+                key={categoryKey}
+                initial={{ y: 50, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: categoryIndex * 0.2 }}
                 viewport={{ once: true }}
-                className="group relative h-full flex"
+                className="bg-white rounded-3xl p-8 shadow-lg"
               >
-                <div className={`bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 ${getColorClasses(client.color).split(' ')[2]} overflow-hidden relative w-full flex flex-col`}>
-                  {/* Background Gradient */}
-                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${getColorClasses(client.color).split(' ')[0]} ${getColorClasses(client.color).split(' ')[1]} opacity-10 rounded-full transform translate-x-16 -translate-y-16`} />
-                  
-                  {/* Category Badge */}
-                  <div className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4 bg-gradient-to-r ${getColorClasses(client.color)} text-white`}>
-                    {client.category}
+                {/* Category Header */}
+                <div className="flex items-center justify-center mb-8">
+                  <div className="flex items-center gap-4">
+                    {category.icon}
+                    <h3 className="text-3xl font-bold text-gray-900">{category.title}</h3>
                   </div>
+                </div>
 
-                  {/* Icon */}
-                  <div className="mb-6 relative z-10">
-                    {client.icon}
-                  </div>
-
-                  {/* Content */}
-                  <div className="relative z-10 flex-1 flex flex-col">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-teal-600 transition-colors">
-                      {client.name}
-                    </h3>
-                    <p className="text-sm text-gray-500 mb-3 font-medium">
-                      {client.type}
-                    </p>
-                    <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                      {client.description}
-                    </p>
-
-                    {/* Location & Partnership */}
-                    <div className="flex items-center justify-between mb-4 text-xs text-gray-500">
-                      <div className="flex items-center">
-                        <FaMapMarkerAlt className="mr-1" />
-                        {client.location}
+                {/* Partners Grid */}
+                <div className={`grid gap-6 ${
+                  category.partners.length === 1 ? 'grid-cols-1 justify-items-center max-w-sm mx-auto' :
+                  category.partners.length === 2 ? 'grid-cols-1 md:grid-cols-2 justify-items-center max-w-2xl mx-auto' :
+                  'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                }`}>
+                  {category.partners.map((partner, partnerIndex) => (
+                    <motion.div
+                      key={partner.name}
+                      initial={{ y: 30, opacity: 0 }}
+                      whileInView={{ y: 0, opacity: 1 }}
+                      whileHover={{ y: -5, scale: 1.02 }}
+                      transition={{ 
+                        duration: 0.5, 
+                        delay: partnerIndex * 0.1,
+                        type: "spring",
+                        stiffness: 200
+                      }}
+                      viewport={{ once: true }}
+                      className="group"
+                    >
+                      <div className={`bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 ${getColorClasses(category.color).split(' ')[2]} h-full flex flex-col items-center text-center`}>
+                        {/* Partner Logo/Avatar */}
+                        <div className="flex-1 flex items-center justify-center p-4 mb-4">
+                          <img 
+                            src={partner.logo} 
+                            alt={`${partner.name} logo`} 
+                            className="max-w-full max-h-24 object-contain group-hover:scale-105 transition-transform duration-300 shadow-md rounded-lg"
+                          />
+                        </div>
+                        
+                        {/* Partner Name */}
+                        <h4 className="text-lg font-bold text-gray-900 group-hover:text-teal-600 transition-colors">
+                          {partner.name}
+                        </h4>
                       </div>
-                      <div className="flex items-center">
-                        <FaHandshake className="mr-1" />
-                        {client.partnership}
-                      </div>
-                    </div>
-
-                    {/* Services */}
-                    <div className="mb-4 flex-1">
-                      <h4 className="text-xs font-semibold text-gray-700 mb-2">Services Provided:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {client.services.map((service, idx) => (
-                          <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                            {service}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Achievements */}
-                    <div className="mt-auto">
-                      <h4 className="text-xs font-semibold text-gray-700 mb-2">Key Highlights:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {client.achievements.map((achievement, idx) => (
-                          <span key={idx} className={`text-xs bg-gradient-to-r ${getColorClasses(client.color)} text-white px-2 py-1 rounded-full`}>
-                            ⭐ {achievement}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Hover Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                    </motion.div>
+                  ))}
                 </div>
               </motion.div>
             ))}
@@ -336,30 +386,7 @@ const Clients = () => {
             </p>
           </motion.div>
           
-          <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            viewport={{ once: true }}
-            className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center"
-          >
-            <div className="space-y-2">
-              <div className="text-4xl font-bold text-blue-600">10+</div>
-              <div className="text-gray-600">Major Clients</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl font-bold text-green-600">25+</div>
-              <div className="text-gray-600">Years Experience</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl font-bold text-purple-600">100%</div>
-              <div className="text-gray-600">Client Satisfaction</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl font-bold text-orange-600">24/7</div>
-              <div className="text-gray-600">Support Available</div>
-            </div>
-          </motion.div>
+          <AnimatedStats />
         </div>
       </section>
     </motion.div>

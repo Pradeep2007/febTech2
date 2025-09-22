@@ -8,40 +8,13 @@ const team = [
   {
     name: 'Pratik Oza',
     title: 'Founder & Director',
-    bio: 'Founder and Director of Fabtech Inc. With 25+ years in diagnostics and biomedical equipment, Pratik leads strategy, partnerships, and growth across Gujarat. Recognized for building trusted relationships with hospitals, CROs, and labs.',
-    tags: ['Leadership', 'Strategy', 'Partnerships'],
-    photo: pratikPhoto, // e.g., require('../assets/images/pratik.jpg')
-    icon: <FaUserTie className="text-3xl text-teal-prime" />,
-    links: { linkedin: '#', email: 'mailto:info@fabtech.inc' }
+    photo: pratikPhoto
   },
   {
     name: 'Miloni Oza',
     title: 'Project Manager',
-    bio: 'Oversees project delivery, operations, and service excellence. Miloni ensures smooth implementations, on-time support, and customer-first execution for hospitals and laboratories.',
-    tags: ['Operations', 'Service', 'Implementation'],
-    photo: miloniPhoto, // e.g., require('../assets/images/miloni.jpg')
-    icon: <FaProjectDiagram className="text-3xl text-blue" />,
-    links: { linkedin: '#', email: 'mailto:info@fabtech.inc' }
-  },
-  {
-    name: 'Rahul Mehta',
-    title: 'Senior Service Engineer',
-    bio: 'Leads technical service, calibration, and preventive maintenance programs to ensure biomedical and surgical equipment operates at international standards.',
-    tags: ['Technical Service', 'Calibration', 'Field Support'],
-    photo: undefined,
-    icon: <FaTools className="text-3xl text-orange" />,
-    links: { linkedin: '#', email: 'mailto:service@fabtech.inc' }
-  },
-  {
-    name: 'Neha Shah',
-    title: 'Business Development Manager',
-    bio: 'Builds strategic partnerships with hospitals, CROs, and advanced labs; drives market outreach and customer success across Gujarat.',
-    tags: ['Partnerships', 'Customer Success', 'Growth'],
-    photo: undefined,
-    icon: <FaBusinessTime className="text-3xl text-rose-500" />,
-    links: { linkedin: '#', email: 'mailto:bd@fabtech.inc' }
-  },
-  // You can add more members here as your team grows
+    photo: miloniPhoto
+  }
 ];
 
 const Members = () => {
@@ -117,7 +90,7 @@ const Members = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
             {team.map((member, idx) => (
               <motion.div
                 key={member.name}
@@ -126,46 +99,26 @@ const Members = () => {
                 whileHover={{ y: -6, scale: 1.02 }}
                 transition={{ duration: 0.6, delay: idx * 0.1 }}
                 viewport={{ once: true }}
-                className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-teal-300 via-cyan-300 to-indigo-300 transition-colors overflow-hidden"
+                className="relative group p-[3px] rounded-3xl bg-gradient-to-r from-teal-300 via-cyan-300 to-indigo-300 transition-colors overflow-hidden"
               >
-                <div className="relative bg-white/95 backdrop-blur rounded-2xl p-6 h-full shadow-sm group-hover:shadow-xl transition-shadow overflow-hidden ring-1 ring-transparent group-hover:ring-teal-100">
-
-                  {/* Header: Photo + Name/Title inline */}
-                  <div className="flex items-center gap-4 mb-4">
-                    {/* Photo / Avatar */}
-                    <div className="w-20 h-20 rounded-xl overflow-hidden ring-1 ring-gray-200 bg-gray-50 flex items-center justify-center shrink-0">
-                      {member.photo ? (
-                        <img src={member.photo} alt={`${member.name} photo`} className="w-full h-full object-cover" />
-                      ) : (
-                        <span className="text-xl font-bold text-gray-500">
-                          {member.name.split(' ').map(p => p[0]).join('')}
-                        </span>
-                      )}
+                <div className="relative bg-white/95 backdrop-blur rounded-3xl p-8 h-full shadow-lg group-hover:shadow-2xl transition-shadow overflow-hidden">
+                  <div className="flex flex-col items-center text-center">
+                    {/* Large Photo */}
+                    <div className="w-48 h-64 rounded-2xl overflow-hidden border-4 border-teal-200 shadow-lg mb-6 group-hover:border-teal-400 transition-all duration-300 relative">
+                      <img 
+                        src={member.photo} 
+                        alt={`${member.name} photo`} 
+                        className={`w-full h-full object-cover transition-all duration-500 ${
+                          member.name === 'Miloni Oza' ? 'object-[center_20%]' : 'object-top'
+                        }`}
+                      />
+                      {/* Black and white overlay - works on both mobile and desktop */}
+                      <div className="absolute inset-0 bg-gray-500 mix-blend-saturation opacity-100 group-hover:opacity-0 group-active:opacity-0 transition-opacity duration-500 pointer-events-none"></div>
                     </div>
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-900 leading-tight">{member.name}</h3>
-                      <p className="text-teal-prime font-medium">{member.title}</p>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 text-sm leading-relaxed mb-4">{member.bio}</p>
-
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {member.tags.map(tag => (
-                      <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Links */}
-                  <div className="flex items-center gap-3">
-                    <a href={member.links.linkedin} className="text-gray-400 hover:text-teal-prime transition-colors" aria-label="LinkedIn">
-                      <FaLinkedin />
-                    </a>
-                    <a href={member.links.email} className="text-gray-400 hover:text-teal-prime transition-colors" aria-label="Email">
-                      <FaEnvelope />
-                    </a>
+                    
+                    {/* Name and Title */}
+                    <h3 className="text-3xl font-bold text-gray-900 mb-2">{member.name}</h3>
+                    <p className="text-teal-700 font-semibold text-xl">{member.title}</p>
                   </div>
                 </div>
               </motion.div>

@@ -58,21 +58,21 @@ const Home = () => {
 
   // Add missing features array
   const features = [
-    {
-      icon: <FaShieldAlt className="text-3xl text-teal-prime" />,
-      title: 'FDA Compliant',
-      description: 'All products meet strict regulatory standards'
-    },
+    // {
+    //   icon: <FaShieldAlt className="text-3xl text-teal-prime" />,
+    //   title: 'FDA Compliant',
+    //   description: 'All products meet strict regulatory standards'
+    // },
     {
       icon: <FaUsers className="text-3xl text-blue" />,
       title: '500+ Clients',
       description: 'Trusted by healthcare providers worldwide'
     },
-    {
-      icon: <FaAward className="text-3xl text-orange" />,
-      title: 'ISO Certified',
-      description: 'Quality management system certification'
-    },
+    // {
+    //   icon: <FaAward className="text-3xl text-orange" />,
+    //   title: 'ISO Certified',
+    //   description: 'Quality management system certification'
+    // },
     {
       icon: <FaBox className="text-3xl text-green-500" />,
       title: 'Quality Products',
@@ -219,8 +219,12 @@ const Home = () => {
       {/* Removed Product Categories section */}
 
       {/* Features Section */}
-      <section className="section-padding bg-light-gray">
-        <div className="container-max">
+      <section className="section-padding bg-light-gray relative overflow-hidden">
+        {/* Animated gradient + subtle overlays */}
+        <div className="absolute inset-0 animated-gradient-bg opacity-60" aria-hidden="true" />
+        <div className="absolute inset-0 pattern-overlay opacity-10 pointer-events-none" aria-hidden="true" />
+        <div className="absolute inset-0 wave-overlay opacity-20 pointer-events-none" aria-hidden="true" />
+        <div className="container-max relative z-10">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -236,17 +240,18 @@ const Home = () => {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex flex-wrap justify-center gap-8">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
+                initial={{ scale: 0.9, y: 20, opacity: 0 }}
+                whileInView={{ scale: 1, y: 0, opacity: 1 }}
+                whileHover={{ scale: 1.05, rotate: 0.5 }}
+                transition={{ duration: 0.8, delay: index * 0.1, type: 'spring' }}
                 viewport={{ once: true }}
-                className="group relative p-[2px] rounded-2xl bg-gradient-to-r from-teal-300 via-cyan-300 to-indigo-300 hover:via-teal-400 transition-all"
+                className="group relative p-[2px] rounded-2xl bg-gradient-to-r from-teal-300 via-cyan-300 to-indigo-300 hover:via-teal-400 transition-all w-full max-w-sm hover-glow-soft transform-gpu"
               >
-                <div className="h-full rounded-2xl bg-white p-6 text-center shadow-sm group-hover:shadow-xl transition-shadow">
+                <div className="h-full rounded-2xl bg-white p-6 text-center shadow-sm group-hover:shadow-xl transition duration-300 ease-out ring-0 ring-transparent group-hover:ring-1 group-hover:ring-teal-200">
                   <div className="mb-4 flex items-center justify-center">
                     {feature.icon}
                   </div>
@@ -262,8 +267,9 @@ const Home = () => {
       </section>
 
       {/* Trusted Partner (Abbott) */}
-      <section className="section-padding bg-white">
-        <div className="container-max">
+      <section className="relative section-padding bg-gradient-to-br from-white via-teal-50 to-indigo-50 overflow-hidden">
+        <div className="container-max relative z-10">
+          {/* Heading */}
           <motion.div
             initial={{ y: 50, opacity: 0 }}
             whileInView={{ y: 0, opacity: 1 }}
@@ -271,30 +277,64 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Trusted Partner</h2>
-            <p className="text-lg text-gray-600">We proudly collaborate with industry leader Abbott</p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">Trusted Partner</h2>
+            <p className="text-lg text-gray-600">
+              We proudly collaborate with industry leader{" "}
+              <motion.span
+                animate={{ scale: [1, 1.12, 1], textShadow: ["0px 0px 0px rgba(56,189,248,0)", "0px 0px 14px rgba(56,189,248,0.7)", "0px 0px 0px rgba(56,189,248,0)"] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="ml-1 font-extrabold bg-gradient-to-r from-teal-500 via-cyan-500 to-indigo-600 bg-clip-text text-transparent text-2xl"
+              >
+                Abbott
+              </motion.span>
+            </p>
           </motion.div>
 
+          {/* Partner Card */}
           <motion.div
-            initial={{ y: 50, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
+            initial={{ scale: 0.9, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.2, type: "spring" }}
             viewport={{ once: true }}
             className="flex justify-center"
           >
             {partners.map((partner) => (
-              <div
+              <motion.div
                 key={partner}
-                className="group relative p-[2px] rounded-2xl bg-gradient-to-r from-teal-300 via-cyan-300 to-indigo-300 hover:via-teal-400 transition-all w-full max-w-md"
+                className={`relative p-[3px] rounded-2xl ${
+                  partner === "Abbott"
+                    ? "bg-gradient-to-r from-teal-400 via-cyan-400 to-indigo-400 animate-pulse"
+                    : "bg-gradient-to-r from-gray-200 to-gray-300"
+                } w-full max-w-md`}
               >
-                <div className="rounded-2xl bg-white p-8 text-center shadow-sm group-hover:shadow-xl transition-shadow">
-                  <div className="text-3xl font-extrabold text-gray-900 mb-2">{partner}</div>
+                <div className="rounded-2xl bg-white p-8 text-center shadow-md group-hover:shadow-2xl transition-shadow duration-500">
+                  <motion.div
+                    animate={partner === "Abbott" ? { scale: [1, 1.05, 1] } : {}}
+                    transition={partner === "Abbott" ? { duration: 2, repeat: Infinity } : {}}
+                    className="text-4xl font-extrabold text-gray-900 mb-2"
+                  >
+                    {partner}
+                  </motion.div>
                   <p className="text-gray-600">Global healthcare and diagnostics leader</p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </motion.div>
         </div>
+
+        {/* Animated Background Shapes */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 0.15, scale: [1, 1.2, 1] }}
+          transition={{ duration: 10, repeat: Infinity }}
+          className="absolute top-20 left-10 w-72 h-72 rounded-full bg-gradient-to-r from-teal-300 to-cyan-400 blur-3xl"
+        />
+        <motion.div
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{ opacity: 0.15, scale: [1, 1.3, 1] }}
+          transition={{ duration: 12, repeat: Infinity }}
+          className="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-gradient-to-r from-indigo-300 to-teal-400 blur-3xl"
+        />
       </section>
 
       {/* About Section */}
@@ -302,14 +342,14 @@ const Home = () => {
         <About/>
       </section>
 
-      {/* Products Section */}
-      <section id="products">
-        <Products/>
-      </section>
-
       {/* Members Section */}
       <section id="members">
         <Members/>
+      </section>
+
+      {/* Products Section */}
+      <section id="products">
+        <Products/>
       </section>
 
       {/* Clients Section */}

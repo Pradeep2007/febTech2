@@ -26,8 +26,12 @@ const FAQ = () => {
       // Filter only active FAQs and group by category
       const activeFaqs = faqData.filter(faq => faq.isActive);
       
+      // Filter FAQs to only include the three allowed categories
+      const allowedCategories = ['Order Process', 'Support', 'Product Category'];
+      const filteredFaqs = activeFaqs.filter(faq => allowedCategories.includes(faq.category));
+      
       // Group FAQs by category
-      const groupedFaqs = activeFaqs.reduce((acc, faq) => {
+      const groupedFaqs = filteredFaqs.reduce((acc, faq) => {
         if (!acc[faq.category]) {
           acc[faq.category] = [];
         }
@@ -38,11 +42,14 @@ const FAQ = () => {
         return acc;
       }, {});
 
-      // Convert to the format expected by the component
-      const faqCategories = Object.keys(groupedFaqs).map(category => ({
-        title: category,
-        faqs: groupedFaqs[category]
-      }));
+      // Convert to the format expected by the component, ensuring order
+      const orderedCategories = ['Order Process', 'Support', 'Product Category'];
+      const faqCategories = orderedCategories
+        .filter(category => groupedFaqs[category] && groupedFaqs[category].length > 0)
+        .map(category => ({
+          title: category,
+          faqs: groupedFaqs[category]
+        }));
 
       setFaqs(faqCategories);
     } catch (error) {
@@ -65,129 +72,56 @@ const FAQ = () => {
     );
   }
 
-  const faqCategories = [
+  // Fallback FAQ categories (only used if Firebase fails to load)
+  const fallbackFaqCategories = [
     {
-      title: 'Order Process & Purchasing',
+      title: 'Order Process',
       faqs: [
         {
           question: 'How do I place an order with FabTech?',
-          answer: 'You can place orders through our online platform, by contacting your dedicated account manager, or by calling our customer service team at (555) 123-4567. For new customers, we recommend scheduling a consultation to set up your account and discuss your specific needs.'
+          answer: 'You can place orders by contacting our sales team directly or through our authorized distributors. We provide personalized consultation to understand your specific medical equipment needs.'
         },
         {
           question: 'What is the minimum order quantity?',
-          answer: 'Minimum order quantities vary by product. Most medical supplies have no minimum order, while specialized equipment may have specific requirements. Your account manager will provide detailed information about MOQs for your specific product needs.'
+          answer: 'Minimum order quantities vary by product. Contact our sales team for specific MOQ information for your required medical equipment and supplies.'
         },
         {
           question: 'Do you offer volume discounts?',
-          answer: 'Yes, we offer competitive volume discounts based on order quantity and frequency. Our pricing tiers are designed to provide better value for larger purchases. Contact your account manager to discuss volume pricing options.'
-        },
-        {
-          question: 'What payment terms do you offer?',
-          answer: 'We offer flexible payment terms including Net 30, Net 60, and Net 90 for qualified customers. We also accept credit cards, wire transfers, and can arrange special payment terms for large orders or long-term contracts.'
-        },
-        {
-          question: 'Can I get a quote before placing an order?',
-          answer: 'Absolutely! We provide detailed quotes for all products and services. You can request quotes through our website, contact your account manager, or call our customer service team. Quotes are typically provided within 24 hours.'
+          answer: 'Yes, we offer competitive pricing for bulk orders. Contact our sales team to discuss volume pricing options for your healthcare facility.'
         }
       ]
     },
     {
-      title: 'Compliance & Quality',
+      title: 'Support',
       faqs: [
         {
-          question: 'Are all your products FDA approved?',
-          answer: 'All medical devices and pharmaceutical products we distribute are FDA approved or cleared, as applicable. We maintain current FDA registration and only work with manufacturers who meet all regulatory requirements. Documentation is available upon request.'
+          question: 'What technical support do you provide?',
+          answer: 'We provide comprehensive technical support including installation, training, maintenance, and troubleshooting for all medical equipment we supply.'
         },
         {
-          question: 'Do you provide certificates of compliance?',
-          answer: 'Yes, we provide certificates of compliance, certificates of analysis, and other required documentation with every shipment. This includes FDA registration certificates, ISO certifications, and product-specific compliance documentation.'
+          question: 'Do you offer equipment maintenance services?',
+          answer: 'Yes, we provide preventive maintenance, calibration, and repair services for biomedical and diagnostic equipment through our qualified service team.'
         },
         {
-          question: 'How do you ensure product authenticity?',
-          answer: 'We maintain a secure supply chain by working exclusively with authorized manufacturers and distributors. Every product includes proper documentation, lot tracking, and chain of custody records to ensure authenticity and traceability.'
-        },
-        {
-          question: 'What quality control measures do you have in place?',
-          answer: 'Our quality control program includes incoming inspection, proper storage conditions, temperature monitoring for sensitive products, batch tracking, and regular supplier audits. We maintain ISO 13485 certification for our quality management system.'
-        },
-        {
-          question: 'Do you handle product recalls?',
-          answer: 'Yes, we have comprehensive recall procedures in place. In the event of a manufacturer recall, we immediately notify affected customers, provide detailed lot information, and coordinate the return or replacement of affected products.'
+          question: 'What are your support hours?',
+          answer: 'Our technical support team is available during business hours. Emergency support is available for critical medical equipment issues.'
         }
       ]
     },
     {
-      title: 'Shipping & Delivery',
+      title: 'Product Category',
       faqs: [
         {
-          question: 'What are your shipping options?',
-          answer: 'We offer standard ground shipping, expedited delivery, next-day delivery, and same-day delivery in select markets. For temperature-sensitive products, we provide validated cold chain shipping with continuous temperature monitoring.'
+          question: 'What types of medical equipment do you supply?',
+          answer: 'We specialize in diagnostic equipment, biomedical instruments, laboratory analyzers, and medical supplies from leading manufacturers like Abbott.'
         },
         {
-          question: 'Do you ship internationally?',
-          answer: 'Yes, we ship to select international markets where we maintain proper import/export licenses and regulatory compliance. International shipping includes all necessary documentation and customs clearance support.'
+          question: 'Do you supply both equipment and consumables?',
+          answer: 'Yes, we provide complete solutions including medical equipment, diagnostic instruments, reagents, and consumables for healthcare facilities.'
         },
         {
-          question: 'How do you handle temperature-sensitive products?',
-          answer: 'Temperature-sensitive products are shipped in validated packaging with continuous temperature monitoring. We use qualified cold chain logistics partners and provide temperature logs with every shipment to ensure product integrity.'
-        },
-        {
-          question: 'What is your typical delivery timeframe?',
-          answer: 'Standard delivery is 2-5 business days depending on location. Expedited options include next-day and same-day delivery in major metropolitan areas. Emergency orders can often be accommodated with special arrangements.'
-        },
-        {
-          question: 'Do you provide tracking information?',
-          answer: 'Yes, tracking information is provided for all shipments via email notification. You can also track orders through our online portal or by contacting customer service. Real-time updates are available for all deliveries.'
-        }
-      ]
-    },
-    {
-      title: 'Account Management & Support',
-      faqs: [
-        {
-          question: 'Do I get a dedicated account manager?',
-          answer: 'Yes, all customers are assigned a dedicated account manager who understands your specific needs and can provide personalized support. Your account manager is your primary point of contact for orders, questions, and account management.'
-        },
-        {
-          question: 'What customer support hours do you offer?',
-          answer: 'Our customer support team is available Monday through Friday, 8 AM to 6 PM EST. Emergency support is available 24/7 for urgent medical supply needs. You can reach us by phone, email, or through our online chat system.'
-        },
-        {
-          question: 'Can you help with inventory management?',
-          answer: 'Yes, we offer comprehensive inventory management services including automated reordering, usage analytics, expiration date tracking, and custom inventory reports. Our digital platform can integrate with your existing systems.'
-        },
-        {
-          question: 'Do you offer training on new products?',
-          answer: 'Yes, we provide product training and education through our manufacturer partners. This includes hands-on training, webinars, educational materials, and ongoing support to ensure proper product use and safety.'
-        },
-        {
-          question: 'How do I update my account information?',
-          answer: 'Account information can be updated through our online portal, by contacting your account manager, or by calling customer service. Changes to billing or shipping addresses require written authorization for security purposes.'
-        }
-      ]
-    },
-    {
-      title: 'Returns & Exchanges',
-      faqs: [
-        {
-          question: 'What is your return policy?',
-          answer: 'We accept returns of unopened, unexpired products within 30 days of delivery. Products must be in original packaging and condition. Some items like controlled substances or custom products may have restrictions. Contact customer service to initiate a return.'
-        },
-        {
-          question: 'How do I return a defective product?',
-          answer: 'Defective products can be returned immediately regardless of the 30-day policy. Contact customer service to report the issue and receive a return authorization. We will arrange pickup and provide immediate replacement or credit.'
-        },
-        {
-          question: 'Do you charge restocking fees?',
-          answer: 'Standard returns may be subject to a 15% restocking fee. However, defective products, shipping errors, and returns due to our error are not subject to restocking fees. Special order items may have different return policies.'
-        },
-        {
-          question: 'Can I exchange products for different items?',
-          answer: 'Yes, exchanges are possible within our return policy timeframe. The price difference will be charged or credited to your account. Contact your account manager to arrange exchanges and ensure product availability.'
-        },
-        {
-          question: 'How long do refunds take to process?',
-          answer: 'Refunds are typically processed within 5-7 business days after we receive the returned products. Credit card refunds may take an additional 3-5 business days to appear on your statement. Account credits are applied immediately upon processing.'
+          question: 'Are your products FDA approved?',
+          answer: 'All medical devices and equipment we distribute meet regulatory requirements and are sourced from certified manufacturers with proper documentation.'
         }
       ]
     }
@@ -222,7 +156,7 @@ const FAQ = () => {
       <section className="section-padding bg-light-gray">
         <div className="container-max">
           <div className="max-w-4xl mx-auto">
-            {faqs.map((category, categoryIndex) => (
+            {(faqs.length > 0 ? faqs : fallbackFaqCategories).map((category, categoryIndex) => (
               <motion.div
                 key={category.title}
                 initial={{ y: 50, opacity: 0 }}
