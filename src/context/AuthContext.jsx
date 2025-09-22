@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 const AuthContext = createContext();
 
@@ -12,53 +13,81 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Admin email - you can also store this in environment variables
-  const ADMIN_EMAIL = 'psy16198@gmail.com';
+  // Admin credentials from environment variables
+  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'admin@fabtech.com';
+  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin123';
+
+  // Restore auth state from localStorage on component mount
+  useEffect(() => {
+    const savedUser = localStorage.getItem('fabtech_admin_user');
+    const savedIsAdmin = localStorage.getItem('fabtech_admin_status');
+    
+    if (savedUser && savedIsAdmin === 'true') {
+      try {
+        const user = JSON.parse(savedUser);
+        setCurrentUser(user);
+        setIsAdmin(true);
+      } catch (error) {
+        console.error('Error parsing saved user data:', error);
+        localStorage.removeItem('fabtech_admin_user');
+        localStorage.removeItem('fabtech_admin_status');
+      }
+    }
+    setLoading(false);
+  }, []);
 
   const login = async (email, password) => {
-    try {
-      // Simple mock login for now
-      if (email === ADMIN_EMAIL) {
-        setCurrentUser({ email });
-        setIsAdmin(true);
-        return { user: { email } };
-      }
-      throw new Error('Invalid credentials');
-    } catch (error) {
-      throw error;
+    // Debug logging
+    console.log('Login attempt:', { email, password });
+    console.log('Expected:', { ADMIN_EMAIL, ADMIN_PASSWORD });
+    
+    // Check both email and password
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      const user = { email };
+      setCurrentUser(user);
+      setIsAdmin(true);
+      
+      // Persist auth state to localStorage
+      localStorage.setItem('fabtech_admin_user', JSON.stringify(user));
+      localStorage.setItem('fabtech_admin_status', 'true');
+      
+      return { user };
     }
+    throw new Error('Invalid email or password');
   };
 
-  const logout = async () => {
-    try {
-      setCurrentUser(null);
-      setIsAdmin(false);
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error;
-    }
+  const logout = () => {
+    setCurrentUser(null);
+    setIsAdmin(false);
+    
+    // Clear auth state from localStorage
+    localStorage.removeItem('fabtech_admin_user');
+    localStorage.removeItem('fabtech_admin_status');
   };
 
-  const signup = async (email, password) => {
-    try {
-      // Simple mock signup for now
-      setCurrentUser({ email });
-      return { user: { email } };
-    } catch (error) {
-      throw error;
-    }
+  const signup = (email) => {
+    // Allow client to create admin account
+    const user = { email };
+    setCurrentUser(user);
+    setIsAdmin(true);
+    
+    // Persist auth state to localStorage
+    localStorage.setItem('fabtech_admin_user', JSON.stringify(user));
+    localStorage.setItem('fabtech_admin_status', 'true');
+    
+    return { user };
   };
 
   const value = {
     currentUser,
     isAdmin,
+    loading,
     login,
     logout,
     signup,
-    loading,
     ADMIN_EMAIL
   };
 
@@ -67,4 +96,9 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+// PropTypes validation
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };

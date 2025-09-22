@@ -80,16 +80,28 @@ const Products = () => {
     >
       {/* Image */}
       <div className="relative w-full h-48 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200" />
-        <div className="relative z-10 w-full h-full flex items-center justify-center">
-          <span className="text-gray-500">Product Image</span>
-        </div>
-        {/* Zoom on hover */}
-        <motion.div
-          className="absolute inset-0"
-          whileHover={{ scale: 1.06 }}
-          transition={{ duration: 0.4 }}
-        />
+        {product.imageUrl ? (
+          <>
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+            {/* Zoom on hover */}
+            <motion.div
+              className="absolute inset-0"
+              whileHover={{ scale: 1.06 }}
+              transition={{ duration: 0.4 }}
+            />
+          </>
+        ) : (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200" />
+            <div className="relative z-10 w-full h-full flex items-center justify-center">
+              <span className="text-gray-500">Product Image</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Body */}
@@ -98,6 +110,11 @@ const Products = () => {
           <span className="px-2 py-1 rounded-full bg-teal-50 text-teal-700 text-xs font-medium border border-teal-100">
             {product.category}
           </span>
+          {product.subcategory && (
+            <span className="px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium border border-blue-100">
+              {product.subcategory}
+            </span>
+          )}
         </div>
 
         <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-1">
@@ -174,8 +191,18 @@ const Products = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <div className="w-full h-64 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-gray-500">Product Image</span>
+              <div className="w-full h-64 rounded-lg mb-4 overflow-hidden">
+                {product.imageUrl ? (
+                  <img
+                    src={product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span className="text-gray-500">Product Image</span>
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
@@ -186,6 +213,12 @@ const Products = () => {
                   <span className="font-semibold">Category:</span>
                   <span>{product.category}</span>
                 </div>
+                {product.subcategory && (
+                  <div className="flex justify-between">
+                    <span className="font-semibold">Subcategory:</span>
+                    <span>{product.subcategory}</span>
+                  </div>
+                )}
               </div>
             </div>
             

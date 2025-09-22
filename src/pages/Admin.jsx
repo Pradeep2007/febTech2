@@ -14,13 +14,7 @@ import {
   FaQuestionCircle,
   FaSave,
   FaSearch,
-  FaShieldAlt,
-  FaUsers,
-  FaAward,
-  FaSignOutAlt,
-  FaFileAlt,
-  FaUpload,
-  FaDownload
+  FaSignOutAlt
 } from 'react-icons/fa';
 import { 
   getProducts, 
@@ -39,9 +33,14 @@ import {
   fileToBase64,
   validateBrochureFile
 } from '../services/brochureService';
+import {
+  uploadImageToCloudinary,
+  validateImageFile,
+  generateImagePreview
+} from '../services/cloudinaryService';
 
 const Admin = () => {
-  const { currentUser, isAdmin, login, logout } = useAuth();
+  const { currentUser, isAdmin, loading: authLoading, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [faqs, setFaqs] = useState([]);
@@ -50,17 +49,23 @@ const Admin = () => {
   const [editingItem, setEditingItem] = useState(null);
   const [showLoginForm, setShowLoginForm] = useState(!currentUser);
   const [searchTerm, setSearchTerm] = useState('');
+  const [imagePreview, setImagePreview] = useState(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('');
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
   useEffect(() => {
     if (isAdmin) {
       loadData();
+      setShowLoginForm(false);
+    } else if (!authLoading) {
+      setShowLoginForm(true);
     }
-  }, [isAdmin]);
+  }, [isAdmin, authLoading]);
 
   // Initialize with empty FAQs array so you can add your own
-  const sampleFaqs = [];
+  // const sampleFaqs = [];
 
   const loadData = async () => {
     try {
@@ -116,35 +121,46 @@ const Admin = () => {
 
 
   const handleAddProduct = () => {
+    const resetForm = () => {
+      reset({
+        name: '',
+        sku: '',
+        category: '',
+        subcategory: '',
+        brand: '',
+        price: '',
+        stock: '',
+        description: '',
+        specifications: ''
+      });
+      setImagePreview(null);
+      setSelectedCategory('');
+      setEditingItem(null);
+    };
     setEditingItem(null);
     setActiveTab('products');
     setShowModal(true);
-    reset({
-      name: '',
-      sku: '',
-      category: 'Harmone analyzer',
-      brand: '',
-      price: '',
-      stock: '',
-      description: '',
-      specifications: ''
-    });
+    resetForm();
   };
 
   const handleEditProduct = (product) => {
     setEditingItem(product);
     setActiveTab('products');
     setShowModal(true);
+    setSelectedCategory(product.category || '');
     reset({
       name: product.name,
       sku: product.sku,
       category: product.category,
+      subcategory: product.subcategory || '',
       brand: product.brand,
       price: product.price,
       stock: product.stock || product.stockQuantity || 0,
       description: product.description,
       specifications: JSON.stringify(product.specifications || {}, null, 2)
     });
+    // Set image preview if product has an image
+    setImagePreview(product.imageUrl || null);
   };
 
   const handleDeleteProduct = async (productId) => {
@@ -238,11 +254,48 @@ const Admin = () => {
     }
   };
 
+  // Handle image file selection
+  const handleImageChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) {
+      setImagePreview(null);
+      return;
+    }
+
+    try {
+      validateImageFile(file);
+      const preview = await generateImagePreview(file);
+      setImagePreview(preview);
+    } catch (error) {
+      toast.error(error.message);
+      event.target.value = ''; // Clear the input
+      setImagePreview(null);
+    }
+  };
+
   const onSubmitProduct = async (data) => {
     try {
       setLoading(true);
       const stockValue = parseInt(data.stock) || 0;
       
+      // Handle image upload
+      const imageInput = document.getElementById('product-image-input');
+      const imageFile = imageInput?.files[0];
+      let imageData = null;
+
+      if (imageFile) {
+        try {
+          setUploadingImage(true);
+          imageData = await uploadImageToCloudinary(imageFile, 'products');
+          toast.success('Image uploaded successfully!');
+        } catch (error) {
+          toast.error('Error uploading image: ' + error.message);
+          return;
+        } finally {
+          setUploadingImage(false);
+        }
+      }
+
       // Handle brochure upload
       const fileInput = document.getElementById('brochure-file-input');
       const file = fileInput?.files[0];
@@ -290,6 +343,7 @@ const Admin = () => {
         name: data.name,
         sku: data.sku || `SKU-${Date.now()}`,
         category: data.category,
+        subcategory: data.subcategory || '',
         brand: data.brand || '',
         price: parseFloat(data.price) || 0,
         stock: stockValue,
@@ -297,6 +351,13 @@ const Admin = () => {
         inStock: stockValue > 0,
         description: data.description,
         specifications: data.specifications ? JSON.parse(data.specifications) : {},
+        // Image data (Cloudinary)
+        imageUrl: imageData?.url || null,
+        imagePublicId: imageData?.publicId || null,
+        imageOriginalName: imageData?.originalName || null,
+        imageSize: imageData?.size || null,
+        imageType: imageData?.type || null,
+        hasImage: !!imageData,
         // Flatten brochure data to avoid nested object issues
         brochureFileName: brochureData?.fileName || null,
         brochureFileType: brochureData?.fileType || null,
@@ -312,6 +373,15 @@ const Admin = () => {
       });
 
       if (editingItem) {
+        // If no new image uploaded, keep existing image data
+        if (!imageFile && editingItem.hasImage) {
+          productData.imageUrl = editingItem.imageUrl;
+          productData.imagePublicId = editingItem.imagePublicId;
+          productData.imageOriginalName = editingItem.imageOriginalName;
+          productData.imageSize = editingItem.imageSize;
+          productData.imageType = editingItem.imageType;
+          productData.hasImage = true;
+        }
         // If no new file uploaded, keep existing brochure data
         if (!file && editingItem.hasBrochure) {
           productData.brochureFileName = editingItem.brochureFileName;
@@ -407,185 +477,18 @@ const Admin = () => {
     );
   };
 
-  // Product Form Modal
-  const ProductModal = () => (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
-    >
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-      >
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {editingProduct ? 'Edit Product' : 'Add New Product'}
-            </h2>
-            <button
-              onClick={() => setShowModal(false)}
-              className="text-gray-500 hover:text-gray-700 text-2xl"
-            >
-              <FaTimes />
-            </button>
-          </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Product Name *
-                </label>
-                <input
-                  type="text"
-                  {...register('name', { required: 'Product name is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-                {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  SKU *
-                </label>
-                <input
-                  type="text"
-                  {...register('sku', { required: 'SKU is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-                {errors.sku && <p className="text-red-500 text-sm mt-1">{errors.sku.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category *
-                </label>
-                <select
-                  {...register('category', { required: 'Category is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                >
-                  <option value="">Select Category</option>
-                  <option value="Harmone analyzer">Harmone analyzer</option>
-                  <option value="Biochemistry analyzer">Biochemistry analyzer</option>
-                </select>
-                {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Brand *
-                </label>
-                <select
-                  {...register('brand', { required: 'Brand is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                >
-                  <option value="">Select Brand</option>
-                  <option value="Sysmax-Biosystems">Sysmax-Biosystems</option>
-                  <option value="Rest Inc.">Rest Inc.</option>
-                </select>
-                {errors.brand && <p className="text-red-500 text-sm mt-1">{errors.brand.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Price *
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  {...register('price', { required: 'Price is required' })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-                {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price.message}</p>}
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Stock Quantity
-                </label>
-                <input
-                  type="number"
-                  {...register('stockQuantity')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Subcategory
-                </label>
-                <input
-                  type="text"
-                  {...register('subcategory')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  In Stock
-                </label>
-                <select
-                  {...register('inStock')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                >
-                  <option value="true">Yes</option>
-                  <option value="false">No</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                {...register('description')}
-                rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Specifications (JSON format)
-              </label>
-              <textarea
-                {...register('specifications')}
-                rows="4"
-                placeholder='{"key": "value", "key2": "value2"}'
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent font-mono text-sm"
-              />
-            </div>
-
-            <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn-primary flex items-center"
-              >
-                {loading ? (
-                  <div className="loading-spinner w-5 h-5 border-2 mr-2"></div>
-                ) : null}
-                {editingProduct ? 'Update Product' : 'Add Product'}
-              </button>
-            </div>
-          </form>
+  // Show loading spinner while auth state is being restored
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-light-gray flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading-spinner w-8 h-8 border-4 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
         </div>
-      </motion.div>
-    </motion.div>
-  );
+      </div>
+    );
+  }
 
   if (showLoginForm || !isAdmin) {
     return <LoginForm />;
@@ -858,25 +761,33 @@ const Admin = () => {
                       </label>
                       <select
                         {...register('category', { required: 'Category is required' })}
+                        onChange={(e) => setSelectedCategory(e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
                       >
+                        <option value="">Select Category</option>
                         <option value="Harmone analyzer">Harmone analyzer</option>
                         <option value="Biochemistry analyzer">Biochemistry analyzer</option>
                       </select>
                     </div>
 
-                    {/* <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        SubCategory *
-                      </label>
-                      <select
-                        {...register('brand', { required: 'Brand is required' })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
-                      >
-                        <option value="Sysmax-Biosystems">Sysmax-Biosystems</option>
-                        <option value="Rest Inc.">Rest Inc.</option>
-                      </select>
-                    </div> */}
+                    {/* Subcategory field - only show for Harmone analyzer */}
+                    {selectedCategory === 'Harmone analyzer' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Subcategory *
+                        </label>
+                        <select
+                          {...register('subcategory', { required: selectedCategory === 'Harmone analyzer' ? 'Subcategory is required' : false })}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                        >
+                          <option value="">Select Subcategory</option>
+                          <option value="Alinity family">Alinity family</option>
+                          <option value="Architect family">Architect family</option>
+                        </select>
+                        {errors.subcategory && <p className="text-red-500 text-sm mt-1">{errors.subcategory.message}</p>}
+                      </div>
+                    )}
+
 
                     {/* <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -911,6 +822,38 @@ const Admin = () => {
                       rows="3"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
                     />
+                  </div>
+
+                  {/* Product Image Upload */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Product Image (JPEG, PNG, WebP - Max 5MB)
+                    </label>
+                    <input
+                      id="product-image-input"
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={handleImageChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                    />
+                    <p className="text-gray-500 text-xs mt-1">
+                      Upload a product image. Supported formats: JPEG, PNG, WebP. Maximum file size: 5MB
+                    </p>
+                    {imagePreview && (
+                      <div className="mt-3">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                        />
+                      </div>
+                    )}
+                    {uploadingImage && (
+                      <div className="mt-2 flex items-center text-blue-600">
+                        <div className="loading-spinner w-4 h-4 border-2 mr-2"></div>
+                        <span className="text-sm">Uploading image...</span>
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -965,10 +908,8 @@ const Admin = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
                     >
                       <option value="Order Process">Order Process</option>
-                      <option value="Compliance">Compliance</option>
-                      <option value="Shipping">Shipping</option>
                       <option value="Support">Support</option>
-                      <option value="Returns">Returns</option>
+                      <option value="Returns">Product Category</option>
                     </select>
                   </div>
 

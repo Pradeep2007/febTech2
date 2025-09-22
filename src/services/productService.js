@@ -9,6 +9,7 @@ import {
   orderBy 
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { deleteImageFromCloudinary } from './cloudinaryService';
 
 const COLLECTION_NAME = 'products';
 
@@ -60,6 +61,16 @@ export const updateProduct = async (productId, productData) => {
 // Delete product
 export const deleteProduct = async (productId) => {
   try {
+    // Get the product first to check if it has an image
+    const products = await getProducts();
+    const product = products.find(p => p.id === productId);
+    
+    // Delete the product image from Cloudinary if it exists
+    if (product && product.imagePublicId) {
+      await deleteImageFromCloudinary(product.imagePublicId);
+    }
+    
+    // Delete the product document
     await deleteDoc(doc(db, COLLECTION_NAME, productId));
   } catch (error) {
     console.error('Error deleting product:', error);
