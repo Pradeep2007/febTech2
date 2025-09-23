@@ -319,7 +319,9 @@ const Admin = () => {
           // Check file size (1MB = 1,048,576 bytes, but base64 adds ~33% overhead)
           const maxSize = 750000; // ~750KB to account for base64 overhead
           if (file.size > maxSize) {
-            toast.error(`File too large! Maximum size is ${Math.round(maxSize/1024)}KB. Your file is ${Math.round(file.size/1024)}KB. Please compress the file.`);
+            const maxSizeKB = Math.round(maxSize / 1024);
+            const fileSizeKB = Math.round(file.size / 1024);
+            toast.error(`File too large! Maximum size is ${maxSizeKB}KB. Your file is ${fileSizeKB}KB. Please compress the file.`);
             return;
           }
           
