@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // PUBLIC READ ACCESS - Allow all users to read these collections
+    match /faqs/{document} {
+      allow read: if true;
+      allow write: if false; // Only allow writes through admin interface
+    }
+    
+    match /products/{document} {
+      allow read: if true;
+      allow write: if false; // Only allow writes through admin interface
+    }
+    
+    match /services/{document} {
+      allow read: if true;
+      allow write: if false; // Only allow writes through admin interface
+    }
+    
+    match /clients/{document} {
+      allow read: if true;
+      allow write: if false; // Only allow writes through admin interface
+    }
+    
+    match /testimonials/{document} {
+      allow read: if true;
+      allow write: if false; // Only allow writes through admin interface
+    }
+    
+    match /brochures/{document} {
+      allow read: if true;
+      allow write: if false; // Only allow writes through admin interface
+    }
+    
+    // CONTACT FORMS - Allow anyone to create, but restrict read/update/delete
+    match /contacts/{document} {
+      allow create: if true;
+      allow read, update, delete: if false; // Only admin can manage contacts
+    }
+    
+    // ADMIN COLLECTIONS - Restrict all access
+    match /admin/{document} {
+      allow read, write: if false; // Admin data should be managed through environment variables
+    }
+    
+    // DEFAULT DENY - All other collections are denied
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

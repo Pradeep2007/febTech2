@@ -500,27 +500,27 @@ const Admin = () => {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen bg-light-gray"
+      className="min-h-screen bg-light-gray pt-20"
     >
       {/* Header */}
       <div className="bg-white shadow-sm">
-        <div className="container-max py-6">
-          <div className="flex justify-between items-center">
+        <div className="container-max py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-4 sm:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600">Manage products and FAQs</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+              <p className="text-gray-600 text-sm sm:text-base">Manage products and FAQs</p>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <div className="flex items-center text-green-600">
                 <FaUserShield className="mr-2" />
-                <span className="font-medium">{currentUser?.email}</span>
+                <span className="font-medium text-sm sm:text-base truncate max-w-[200px]">{currentUser?.email}</span>
               </div>
               <button
                 onClick={logout}
-                className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-colors"
+                className="flex items-center space-x-2 bg-red-500 text-white px-3 py-2 sm:px-4 rounded-lg hover:bg-red-600 transition-colors text-sm sm:text-base"
               >
                 <FaSignOutAlt />
-                <span>Logout</span>
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           </div>
@@ -528,136 +528,155 @@ const Admin = () => {
       </div>
 
       {/* Tabs */}
-      <div className="container-max py-8">
+      <div className="container-max py-4 sm:py-8">
         <div className="bg-white rounded-xl shadow-lg mb-8">
           <div className="border-b border-gray-200">
-            <nav className="flex space-x-8 px-6">
+            <nav className="flex space-x-4 sm:space-x-8 px-4 sm:px-6 overflow-x-auto">
               <button
                 onClick={() => setActiveTab('products')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                   activeTab === 'products'
                     ? 'border-teal-prime text-teal-prime'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <FaBox className="inline mr-2" />
-                Products ({products.length})
+                <FaBox className="inline mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Products</span>
+                <span className="sm:hidden">Prod</span>
+                <span className="ml-1">({products.length})</span>
               </button>
               <button
                 onClick={() => setActiveTab('faqs')}
-                className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
                   activeTab === 'faqs'
                     ? 'border-teal-prime text-teal-prime'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
-                <FaQuestionCircle className="inline mr-2" />
-                FAQs ({faqs.length})
+                <FaQuestionCircle className="inline mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">FAQs</span>
+                <span className="sm:hidden">FAQ</span>
+                <span className="ml-1">({faqs.length})</span>
               </button>
             </nav>
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {/* Search and Add Button */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-              <div className="relative mb-4 md:mb-0">
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center mb-6 space-y-3 sm:space-y-0">
+              <div className="relative flex-1 sm:flex-initial">
                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
                   placeholder={`Search ${activeTab}...`}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                  className="w-full sm:w-auto pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent text-sm sm:text-base"
                 />
               </div>
               <button
                 onClick={activeTab === 'products' ? handleAddProduct : handleAddFaq}
-                className="btn-primary flex items-center"
+                className="btn-primary flex items-center justify-center text-sm sm:text-base px-3 py-2 sm:px-4"
               >
                 <FaPlus className="mr-2" />
-                Add {activeTab === 'products' ? 'Product' : 'FAQ'}
+                <span className="hidden sm:inline">Add {activeTab === 'products' ? 'Product' : 'FAQ'}</span>
+                <span className="sm:hidden">{activeTab === 'products' ? 'Product' : 'FAQ'}</span>
               </button>
             </div>
 
             {/* Products Tab */}
             {activeTab === 'products' && (
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Product
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        SKU
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Category
-                      </th>
-                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Brand
-                      </th> */}
-                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Price
-                      </th> */}
-                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Stock
-                      </th> */}
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {filteredProducts.map((product) => (
-                      <tr key={product.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {product.sku || '-'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+              <div className="space-y-4">
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Product
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          SKU
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Category
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {filteredProducts.map((product) => (
+                        <tr key={product.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {product.sku || '-'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                              {product.category}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEditProduct(product)}
+                                className="text-blue-600 hover:text-blue-900 p-1"
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteProduct(product.id)}
+                                className="text-red-600 hover:text-red-900 p-1"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
+                  {filteredProducts.map((product) => (
+                    <div key={product.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium text-gray-900 text-sm">{product.name}</h3>
+                        <div className="flex space-x-2 ml-2">
+                          <button
+                            onClick={() => handleEditProduct(product)}
+                            className="text-blue-600 hover:text-blue-900 p-1"
+                          >
+                            <FaEdit className="text-sm" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(product.id)}
+                            className="text-red-600 hover:text-red-900 p-1"
+                          >
+                            <FaTrash className="text-sm" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-1 text-xs">
+                        <div className="text-gray-600">
+                          <span className="font-medium">SKU:</span> {product.sku || '-'}
+                        </div>
+                        <div>
+                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                             {product.category}
                           </span>
-                        </td>
-                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {product.brand}
-                        </td> */}
-                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ${product.price}
-                        </td> */}
-                        {/* <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                            (product.stock || product.stockQuantity) > 50 ? 'bg-green-100 text-green-800' :
-                            (product.stock || product.stockQuantity) > 10 ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                            {product.stock || product.stockQuantity} units
-                          </span>
-                        </td> */}
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleEditProduct(product)}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              <FaEdit />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteProduct(product.id)}
-                              className="text-red-600 hover:text-red-900"
-                            >
-                              <FaTrash />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -665,11 +684,11 @@ const Admin = () => {
             {activeTab === 'faqs' && (
               <div className="space-y-4">
                 {filteredFaqs.map((faq) => (
-                  <div key={faq.id} className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex justify-between items-start">
+                  <div key={faq.id} className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0">
                       <div className="flex-1">
-                        <div className="flex items-center mb-2">
-                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-teal-100 text-teal-800 mr-2">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-teal-100 text-teal-800">
                             {faq.category}
                           </span>
                           <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
@@ -678,21 +697,21 @@ const Admin = () => {
                             {faq.isActive ? 'Active' : 'Inactive'}
                           </span>
                         </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">{faq.question}</h3>
-                        <p className="text-gray-600 text-sm">{faq.answer}</p>
+                        <h3 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base">{faq.question}</h3>
+                        <p className="text-gray-600 text-xs sm:text-sm leading-relaxed">{faq.answer}</p>
                       </div>
-                      <div className="flex space-x-2 ml-4">
+                      <div className="flex space-x-2 sm:ml-4 self-end sm:self-start">
                         <button
                           onClick={() => handleEditFaq(faq)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-900 p-1"
                         >
-                          <FaEdit />
+                          <FaEdit className="text-sm" />
                         </button>
                         <button
                           onClick={() => handleDeleteFaq(faq.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 hover:text-red-900 p-1"
                         >
-                          <FaTrash />
+                          <FaTrash className="text-sm" />
                         </button>
                       </div>
                     </div>
@@ -707,28 +726,28 @@ const Admin = () => {
 
       {/* Modal for Add/Edit */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start sm:items-center justify-center z-50 p-2 sm:p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto mt-2 sm:mt-0"
           >
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-gray-900">
+            <div className="p-4 sm:p-6">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">
                   {editingItem ? 'Edit' : 'Add'} {activeTab === 'products' ? 'Product' : 'FAQ'}
                 </h3>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 p-1"
                 >
-                  <FaTimes />
+                  <FaTimes className="text-lg" />
                 </button>
               </div>
 
               {activeTab === 'products' ? (
-                <form onSubmit={handleSubmit(onSubmitProduct)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <form onSubmit={handleSubmit(onSubmitProduct)} className="space-y-3 sm:space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Product Name *
@@ -883,22 +902,22 @@ const Admin = () => {
                     />
                   </div> */}
 
-                  <div className="flex justify-end space-x-4 pt-4">
+                  <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-4">
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                      className="w-full sm:w-auto px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg text-sm sm:text-base"
                     >
                       Cancel
                     </button>
-                    <button type="submit" className="btn-primary flex items-center">
+                    <button type="submit" className="w-full sm:w-auto btn-primary flex items-center justify-center text-sm sm:text-base">
                       <FaSave className="mr-2" />
                       {editingItem ? 'Update' : 'Add'} Product
                     </button>
                   </div>
                 </form>
               ) : (
-                <form onSubmit={handleSubmit(onSubmitFaq)} className="space-y-4">
+                <form onSubmit={handleSubmit(onSubmitFaq)} className="space-y-3 sm:space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Category *
@@ -950,15 +969,15 @@ const Admin = () => {
                     </select>
                   </div>
 
-                  <div className="flex justify-end space-x-4 pt-4">
+                  <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-4">
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                      className="w-full sm:w-auto px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg text-sm sm:text-base"
                     >
                       Cancel
                     </button>
-                    <button type="submit" className="btn-primary flex items-center">
+                    <button type="submit" className="w-full sm:w-auto btn-primary flex items-center justify-center text-sm sm:text-base">
                       <FaSave className="mr-2" />
                       {editingItem ? 'Update' : 'Add'} FAQ
                     </button>

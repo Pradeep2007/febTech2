@@ -1,0 +1,12 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // TEMPORARY PERMISSIVE RULES FOR DEVELOPMENT
+    // These rules allow all read and write operations
+    // Use this while your app uses localStorage-based authentication
+    
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
