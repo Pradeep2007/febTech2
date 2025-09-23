@@ -1,91 +1,149 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+// Using EmailJS via CDN - no import needed
+// import { toast } from 'react-toastify';
 import { 
   FaPhone, 
   FaEnvelope, 
-  FaMapMarkerAlt, 
-  FaClock,
   FaUser,
   FaBuilding,
   FaPaperPlane,
   FaCheckCircle,
-  FaLinkedin
+  FaLinkedin,
+  FaExclamationTriangle
 } from 'react-icons/fa';
 
 const Contact = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   
   const { register, handleSubmit, reset, formState: { errors } } = useForm();
 
-  const contactInfo = [
-    {
-      icon: <FaPhone className="text-2xl text-teal-prime" />,
-      title: 'Phone',
-      details: ['+1 (555) 123-4567', '+1 (555) 123-4568 (Emergency)'],
-      description: 'Mon-Fri: 8 AM - 6 PM EST'
-    },
-    {
-      icon: <FaEnvelope className="text-2xl text-blue" />,
-      title: 'Email',
-      details: ['info@fabtech.com', 'support@fabtech.com'],
-      description: 'Response within 24 hours'
-    },
-    {
-      icon: <FaMapMarkerAlt className="text-2xl text-orange" />,
-      title: 'Address',
-      details: ['123 Medical District', 'Healthcare City, HC 12345'],
-      description: 'United States'
-    },
-    {
-      icon: <FaClock className="text-2xl text-green-500" />,
-      title: 'Business Hours',
-      details: ['Monday - Friday: 8:00 AM - 6:00 PM', 'Saturday: 9:00 AM - 2:00 PM'],
-      description: 'Emergency support available 24/7'
-    }
-  ];
+  // EmailJS configuration from environment variables
+  const emailjsConfig = {
+    serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+    templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+    publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+    receiveEmail: import.meta.env.VITE_CONTACT_RECEIVE_EMAIL
+  };
 
-  const departments = [
-    {
-      name: 'Sales & New Accounts',
-      email: 'sales@fabtech.com',
-      phone: '+1 (555) 123-4567',
-      description: 'Product inquiries, quotes, and new customer setup'
-    },
-    {
-      name: 'Customer Support',
-      email: 'support@fabtech.com',
-      phone: '+1 (555) 123-4568',
-      description: 'Order status, account management, and general support'
-    },
-    {
-      name: 'Compliance & Quality',
-      email: 'compliance@fabtech.com',
-      phone: '+1 (555) 123-4569',
-      description: 'Regulatory questions, certifications, and quality issues'
-    },
-    {
-      name: 'Emergency Orders',
-      email: 'emergency@fabtech.com',
-      phone: '+1 (555) 123-4570',
-      description: 'Urgent medical supply needs and emergency support'
-    }
-  ];
+  // Contact info data (currently not displayed)
+  // const contactInfo = [
+  //   {
+  //     icon: <FaPhone className="text-2xl text-teal-prime" />,
+  //     title: 'Phone',
+  //     details: ['+1 (555) 123-4567', '+1 (555) 123-4568 (Emergency)'],
+  //     description: 'Mon-Fri: 8 AM - 6 PM EST'
+  //   },
+  //   {
+  //     icon: <FaEnvelope className="text-2xl text-blue" />,
+  //     title: 'Email',
+  //     details: ['info@fabtech.com', 'support@fabtech.com'],
+  //     description: 'Response within 24 hours'
+  //   },
+  //   {
+  //     icon: <FaMapMarkerAlt className="text-2xl text-orange" />,
+  //     title: 'Address',
+  //     details: ['123 Medical District', 'Healthcare City, HC 12345'],
+  //     description: 'United States'
+  //   },
+  //   {
+  //     icon: <FaClock className="text-2xl text-green-500" />,
+  //     title: 'Business Hours',
+  //     details: ['Monday - Friday: 8:00 AM - 6:00 PM', 'Saturday: 9:00 AM - 2:00 PM'],
+  //     description: 'Emergency support available 24/7'
+  //   }
+  // ];
+
+  // Department contacts data (currently not displayed)
+  // const departments = [
+  //   {
+  //     name: 'Sales & New Accounts',
+  //     email: 'sales@fabtech.com',
+  //     phone: '+1 (555) 123-4567',
+  //     description: 'Product inquiries, quotes, and new customer setup'
+  //   },
+  //   {
+  //     name: 'Customer Support',
+  //     email: 'support@fabtech.com',
+  //     phone: '+1 (555) 123-4568',
+  //     description: 'Order status, account management, and general support'
+  //   },
+  //   {
+  //     name: 'Compliance & Quality',
+  //     email: 'compliance@fabtech.com',
+  //     phone: '+1 (555) 123-4569',
+  //     description: 'Regulatory questions, certifications, and quality issues'
+  //   },
+  //   {
+  //     name: 'Emergency Orders',
+  //     email: 'emergency@fabtech.com',
+  //     phone: '+1 (555) 123-4570',
+  //     description: 'Urgent medical supply needs and emergency support'
+  //   }
+  // ];
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
+    setSubmitError('');
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    console.log('Form submitted:', data);
-    setIsSubmitted(true);
-    setIsSubmitting(false);
-    reset();
-    
-    // Reset success message after 5 seconds
-    setTimeout(() => setIsSubmitted(false), 5000);
+    try {
+      console.log('Form data:', data);
+      console.log('EmailJS Config:', emailjsConfig);
+      
+      // Check if EmailJS is loaded and configured
+      if (!window.emailjs) {
+        throw new Error('EmailJS is not loaded. Please check the CDN script in index.html.');
+      }
+      
+      if (!emailjsConfig.serviceId || !emailjsConfig.templateId || !emailjsConfig.publicKey) {
+        throw new Error('EmailJS configuration is missing. Please check your environment variables in .env file.');
+      }
+
+      // Prepare template parameters
+      const templateParams = {
+        from_name: `${data.firstName} ${data.lastName}`,
+        from_email: data.email,
+        phone: data.phone || 'Not provided',
+        organization: data.organization || 'Not provided',
+        inquiry_type: data.inquiryType,
+        message: data.message,
+        to_email: emailjsConfig.receiveEmail,
+        reply_to: data.email
+      };
+
+      console.log('Sending email with params:', templateParams);
+      console.log('Sending to email service:', emailjsConfig.serviceId);
+      console.log('Using template:', emailjsConfig.templateId);
+      console.log('Email will be sent to:', emailjsConfig.receiveEmail);
+
+      // Send email using EmailJS CDN
+      const result = await window.emailjs.send(
+        emailjsConfig.serviceId,
+        emailjsConfig.templateId,
+        templateParams,
+        emailjsConfig.publicKey
+      );
+
+      console.log('Email sent successfully:', result);
+      
+      // Show success message
+      setIsSubmitted(true);
+      console.log('Message sent successfully!');
+      reset();
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => setIsSubmitted(false), 5000);
+      
+    } catch (error) {
+      console.error('Error sending email:', error);
+      setSubmitError(error.message || 'Failed to send message. Please try again.');
+      console.log('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -183,6 +241,19 @@ const Contact = () => {
                     <FaCheckCircle className="text-green-500 mr-3" />
                     <span className="text-green-800">
                       Thank you! Your message has been sent successfully.
+                    </span>
+                  </motion.div>
+                )}
+
+                {submitError && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-center"
+                  >
+                    <FaExclamationTriangle className="text-red-500 mr-3" />
+                    <span className="text-red-800">
+                      {submitError}
                     </span>
                   </motion.div>
                 )}

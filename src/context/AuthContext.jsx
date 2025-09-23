@@ -17,8 +17,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // Admin credentials from environment variables
-  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'admin@fabtech.com';
-  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'admin123';
+  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL;
+  const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
   // Restore auth state from localStorage on component mount
   useEffect(() => {

@@ -101,7 +101,7 @@ const Home = () => {
         {/* Soft glow accents */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -top-24 -left-24 w-[28rem] h-[28rem] blur-3xl opacity-30"
+          className="pointer-events-none absolute -top-24 -left-24 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 lg:w-[28rem] lg:h-[28rem] blur-3xl opacity-30"
           style={{
             background:
               'radial-gradient( circle at center, rgba(255,225,150,0.45) 0%, rgba(255,200,100,0.25) 35%, rgba(255,255,255,0) 70% )'
@@ -109,7 +109,7 @@ const Home = () => {
         />
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -bottom-24 -right-24 w-[24rem] h-[24rem] blur-3xl opacity-25"
+          className="pointer-events-none absolute -bottom-24 -right-24 w-56 h-56 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-[24rem] lg:h-[24rem] blur-3xl opacity-25"
           style={{
             background:
               'radial-gradient( circle at center, rgba(99,179,237,0.35) 0%, rgba(20,184,166,0.2) 40%, rgba(255,255,255,0) 70% )'
@@ -151,34 +151,34 @@ const Home = () => {
             transition={{ duration: 0.8 }}
             className="max-w-5xl mx-auto"
           >
-            <h1 className="text-5xl md:text-6xl lg:text-6xl font-extrabold text-white mb-3 md:mb-4 leading-[1.15] tracking-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-3 md:mb-4 leading-[1.15] tracking-tight">
               Leading Medical Equipment Provider
               <span className="block bg-gradient-to-r from-teal-200 via-cyan-200 to-white bg-clip-text text-transparent leading-[1.25] pb-1">
                 Delivering Advanced Medical Technology for Better Patient Care
               </span>
             </h1>
 
-            <p className="text-base md:text-lg lg:text-xl text-white/90 mt-5 md:mt-8 mb-4 md:mb-5 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 mt-5 md:mt-8 mb-4 md:mb-5 max-w-4xl mx-auto leading-relaxed px-4">
               At Fabtech Inc, we empower hospitals, laboratories, and healthcare professionals with innovative
               healthcare solutions, diagnostic devices, surgical equipment, and biomedical equipment. Our mission is
               to improve quality of life by ensuring accessible medical equipment, supporting doctors, and enhancing
               patient outcomes.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-0">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-0 px-4">
               <Link
                 to="/products"
-                className="inline-flex items-center justify-center gap-2 rounded-xl text-base md:text-lg px-7 md:px-8 py-3.5 md:py-4 text-white bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 transition-colors shadow-lg shadow-black/10 font-semibold whitespace-nowrap min-w-[270px] md:min-w-[320px]"
+                className="inline-flex items-center justify-center gap-2 rounded-xl text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 md:py-4 text-white bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 transition-colors shadow-lg shadow-black/10 font-semibold text-center"
               >
                 <FaShoppingCart className="opacity-90" size={20} />
-                Explore Our Medical Supplies
+                <span className="hidden sm:inline">Explore Our Medical Supplies</span><span className="sm:hidden">Medical Supplies</span>
               </Link>
               <Link
                 to="/contact"
-                className="inline-flex items-center justify-center gap-2 rounded-xl text-base md:text-lg px-7 md:px-8 py-3.5 md:py-4 text-white bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 transition-colors shadow-lg shadow-black/10 font-semibold whitespace-nowrap min-w-[270px] md:min-w-[320px]"
+                className="inline-flex items-center justify-center gap-2 rounded-xl text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 md:py-4 text-white bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 transition-colors shadow-lg shadow-black/10 font-semibold text-center"
               >
                 <FaHandshake className="opacity-90" size={20} />
-                Partner with Us for Healthcare Excellence
+                <span className="hidden sm:inline">Partner with Us for Healthcare Excellence</span><span className="sm:hidden">Partner with Us</span>
               </Link>
             </div>
           </motion.div>
@@ -232,10 +232,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Why Choose FabTech?
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4">
               We're committed to excellence in every aspect of our business
             </p>
           </motion.div>
@@ -277,13 +277,13 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">Trusted Partner</h2>
-            <p className="text-lg text-gray-600">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">Trusted Partner</h2>
+            <p className="text-base sm:text-lg text-gray-600 px-4">
               We proudly collaborate with industry leader{" "}
               <motion.span
                 animate={{ scale: [1, 1.12, 1], textShadow: ["0px 0px 0px rgba(56,189,248,0)", "0px 0px 14px rgba(56,189,248,0.7)", "0px 0px 0px rgba(56,189,248,0)"] }}
                 transition={{ duration: 2, repeat: Infinity }}
-                className="ml-1 font-extrabold bg-gradient-to-r from-teal-500 via-cyan-500 to-indigo-600 bg-clip-text text-transparent text-2xl"
+                className="ml-1 font-extrabold bg-gradient-to-r from-teal-500 via-cyan-500 to-indigo-600 bg-clip-text text-transparent text-xl sm:text-2xl"
               >
                 Abbott
               </motion.span>
@@ -327,13 +327,13 @@ const Home = () => {
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 0.15, scale: [1, 1.2, 1] }}
           transition={{ duration: 10, repeat: Infinity }}
-          className="absolute top-20 left-10 w-72 h-72 rounded-full bg-gradient-to-r from-teal-300 to-cyan-400 blur-3xl"
+          className="absolute top-20 left-10 w-48 h-48 sm:w-64 sm:h-64 md:w-72 md:h-72 rounded-full bg-gradient-to-r from-teal-300 to-cyan-400 blur-3xl"
         />
         <motion.div
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 0.15, scale: [1, 1.3, 1] }}
           transition={{ duration: 12, repeat: Infinity }}
-          className="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-gradient-to-r from-indigo-300 to-teal-400 blur-3xl"
+          className="absolute bottom-10 right-10 w-52 h-52 sm:w-68 sm:h-68 md:w-80 md:h-80 rounded-full bg-gradient-to-r from-indigo-300 to-teal-400 blur-3xl"
         />
       </section>
 

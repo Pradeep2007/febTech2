@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+// import { ToastContainer } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 
 // Components
 import SplashScreen from './components/SplashScreen';
@@ -60,6 +62,19 @@ function App() {
             </Routes>
           </AnimatePresence>
           <Footer />
+          {/* ToastContainer temporarily disabled due to import issues */}
+          {/* <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          /> */}
         </div>
       </Router>
     </AuthProvider>
