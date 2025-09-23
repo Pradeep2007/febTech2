@@ -421,14 +421,14 @@ const Contact = () => {
                   </h3>
                   <div className="space-y-2">
                     <p className="text-lg font-semibold text-gray-800">
-                      +91 98765 43210
+                      +91 9879500494
                     </p>
-                    <p className="text-gray-600">
+                    {/* <p className="text-gray-600">
                       Monday - Friday: 9:00 AM - 6:00 PM
                     </p>
                     <p className="text-gray-600">
                       Saturday: 9:00 AM - 2:00 PM
-                    </p>
+                    </p> */}
                   </div>
                 </div>
               </div>
@@ -442,7 +442,7 @@ const Contact = () => {
                   </h3>
                   <div className="space-y-2">
                     <p className="text-lg font-semibold text-gray-800">
-                      info@fabtech.com
+                    info@fabtechinc.in
                     </p>
                     <p className="text-gray-600">
                       We respond within 24 hours
@@ -469,7 +469,7 @@ const Contact = () => {
                       Connect with us professionally
                     </p>
                     <a 
-                      href="https://linkedin.com/company/fabtech-healthcare" 
+                      href="https://www.linkedin.com/in/pratik-oza-20b20844/" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="inline-block mt-3 btn-primary"

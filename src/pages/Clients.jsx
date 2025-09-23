@@ -58,13 +58,13 @@ const Clients = () => {
     const isInView = useInView(ref, { once: true, threshold: 0.3 });
     
     const stats = [
-      { number: '10+', label: 'Major Clients', color: 'text-blue-600' },
+      { number: '65+', label: 'Major Clients', color: 'text-blue-600' },
       { number: '25+', label: 'Years Experience', color: 'text-green-600' },
       { number: '100%', label: 'Client Satisfaction', color: 'text-purple-600' },
       { number: '24/7', label: 'Support Available', color: 'text-orange-600' }
     ];
     
-    const count1 = useAnimatedCounter('10+', 2000, isInView);
+    const count1 = useAnimatedCounter('65+', 2000, isInView);
     const count2 = useAnimatedCounter('25+', 2500, isInView);
     const count3 = useAnimatedCounter('100%', 3000, isInView);
     const count4 = useAnimatedCounter('24/7', 2000, isInView);
@@ -98,68 +98,41 @@ const Clients = () => {
       </motion.div>
     );
   };
-  const partnerCategories = {
-    'Government': {
-      title: 'Government Institutions',
-      icon: <FaHospital className="text-4xl text-blue-600" />,
-      color: 'blue',
-      partners: [
-        {
-          name: 'Civil Hospital Amdabad',
-          logo: client1
-        },
-        {
-          name: 'U.N. Mehta Institute of Cardiology and Research Center',
-          logo: client6
-        },
-        {
-          name: 'Government Medical College, Bhavnagar',
-          logo: client8
-        }
-      ]
+  // Unified clients array - all clients in one list
+  const allClients = [
+    {
+      name: 'Civil Hospital Amdabad',
+      logo: client1
     },
-    'Clinical Research': {
-      title: 'Clinical Research Organizations',
-      icon: <FaFlask className="text-4xl text-teal-600" />,
-      color: 'teal',
-      partners: [
-        {
-          name: 'Cliantha Clinical Research',
-          logo: client3
-        },
-        {
-          name: 'Lambda Research Accelerated',
-          logo: client5
-        }
-      ]
+    {
+      name: 'U.N. Mehta Institute of Cardiology and Research Center',
+      logo: client6
     },
-    'Corporate Hospitals': {
-      title: 'Corporate Hospitals & Private Labs',
-      icon: <FaHeartbeat className="text-4xl text-red-500" />,
-      color: 'red',
-      partners: [
-        {
-          name: 'Shalby Multi-Specialty Care',
-          logo: client7
-        },
-        {
-          name: 'Sanjeevani Pathology Laboratory',
-          logo: client2
-        }
-      ]
+    {
+      name: 'Government Medical College, Bhavnagar',
+      logo: client8
     },
-    'Pharma Companies': {
-      title: 'Pharmaceutical Companies',
-      icon: <FaPills className="text-4xl text-green-600" />,
-      color: 'green',
-      partners: [
-        {
-          name: 'Intas Pharmaceuticals',
-          logo: client4
-        }
-      ]
+    {
+      name: 'Cliantha Clinical Research',
+      logo: client3
+    },
+    {
+      name: 'Lambda Research Accelerated',
+      logo: client5
+    },
+    {
+      name: 'Shalby Multi-Specialty Care',
+      logo: client7
+    },
+    {
+      name: 'Sanjeevani Pathology Laboratory',
+      logo: client2
+    },
+    {
+      name: 'Intas Pharmaceuticals',
+      logo: client4
     }
-  };
+  ];
 
   const testimonials = [
     {
@@ -250,17 +223,6 @@ const Clients = () => {
     { number: '98%', label: 'Client Retention Rate' }
   ];
 
-  const getColorClasses = (color) => {
-    const colorMap = {
-      blue: 'from-blue-500 to-blue-600 border-blue-200',
-      red: 'from-red-500 to-red-600 border-red-200',
-      green: 'from-green-500 to-green-600 border-green-200',
-      purple: 'from-purple-500 to-purple-600 border-purple-200',
-      teal: 'from-teal-500 to-teal-600 border-teal-200',
-      orange: 'from-orange-500 to-orange-600 border-orange-200'
-    };
-    return colorMap[color] || 'from-gray-500 to-gray-600 border-gray-200';
-  };
 
   return (
     <motion.div
@@ -277,7 +239,7 @@ const Clients = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl font-bold mb-6">Authorized Channel Partner</h1>
+            <h1 className="text-5xl font-bold mb-6">Authorized Channel Clients</h1>
             <p className="text-xl text-light-teal max-w-3xl mx-auto">
               Trusted partnerships with leading healthcare institutions, pharmaceutical companies, 
               and research organizations across Gujarat and beyond.
@@ -286,7 +248,7 @@ const Clients = () => {
         </div>
       </section>
 
-      {/* Partner Categories */}
+      {/* All Clients Section */}
       <section className="section-padding bg-gradient-to-br from-gray-50 to-blue-50">
         <div className="container-max">
           <motion.div
@@ -296,75 +258,52 @@ const Clients = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Our Trusted Partners
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Building strong partnerships across four key healthcare sectors in Gujarat and beyond.
-            </p>
+            
           </motion.div>
 
-          {/* Categories */}
-          <div className="space-y-16">
-            {Object.entries(partnerCategories).map(([categoryKey, category], categoryIndex) => (
-              <motion.div
-                key={categoryKey}
-                initial={{ y: 50, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, delay: categoryIndex * 0.2 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-3xl p-8 shadow-lg"
-              >
-                {/* Category Header */}
-                <div className="flex items-center justify-center mb-8">
-                  <div className="flex items-center gap-4">
-                    {category.icon}
-                    <h3 className="text-3xl font-bold text-gray-900">{category.title}</h3>
+          {/* Unified Clients Grid */}
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="bg-white rounded-3xl p-8 shadow-lg"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {allClients.map((client, index) => (
+                <motion.div
+                  key={client.name}
+                  initial={{ y: 30, opacity: 0 }}
+                  whileInView={{ y: 0, opacity: 1 }}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  transition={{ 
+                    duration: 0.5, 
+                    delay: index * 0.1,
+                    type: "spring",
+                    stiffness: 200
+                  }}
+                  viewport={{ once: true }}
+                  className="group"
+                >
+                  <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-teal-200 h-full flex flex-col items-center text-center">
+                    {/* Client Logo */}
+                    <div className="flex-1 flex items-center justify-center p-4 mb-4">
+                      <img 
+                        src={client.logo} 
+                        alt={`${client.name} logo`} 
+                        className="max-w-full max-h-24 object-contain group-hover:scale-105 transition-transform duration-300 shadow-md rounded-lg"
+                      />
+                    </div>
+                    
+                    {/* Client Name */}
+                    <h4 className="text-lg font-bold text-gray-900 group-hover:text-teal-600 transition-colors">
+                      {client.name}
+                    </h4>
                   </div>
-                </div>
-
-                {/* Partners Grid */}
-                <div className={`grid gap-6 ${
-                  category.partners.length === 1 ? 'grid-cols-1 justify-items-center max-w-sm mx-auto' :
-                  category.partners.length === 2 ? 'grid-cols-1 md:grid-cols-2 justify-items-center max-w-2xl mx-auto' :
-                  'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                }`}>
-                  {category.partners.map((partner, partnerIndex) => (
-                    <motion.div
-                      key={partner.name}
-                      initial={{ y: 30, opacity: 0 }}
-                      whileInView={{ y: 0, opacity: 1 }}
-                      whileHover={{ y: -5, scale: 1.02 }}
-                      transition={{ 
-                        duration: 0.5, 
-                        delay: partnerIndex * 0.1,
-                        type: "spring",
-                        stiffness: 200
-                      }}
-                      viewport={{ once: true }}
-                      className="group"
-                    >
-                      <div className={`bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 ${getColorClasses(category.color).split(' ')[2]} h-full flex flex-col items-center text-center`}>
-                        {/* Partner Logo/Avatar */}
-                        <div className="flex-1 flex items-center justify-center p-4 mb-4">
-                          <img 
-                            src={partner.logo} 
-                            alt={`${partner.name} logo`} 
-                            className="max-w-full max-h-24 object-contain group-hover:scale-105 transition-transform duration-300 shadow-md rounded-lg"
-                          />
-                        </div>
-                        
-                        {/* Partner Name */}
-                        <h4 className="text-lg font-bold text-gray-900 group-hover:text-teal-600 transition-colors">
-                          {partner.name}
-                        </h4>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 

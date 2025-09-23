@@ -22,7 +22,8 @@ import {
   FaCog,
   FaAward,
   FaHandshake,
-  FaCheckCircle
+  FaCheckCircle,
+  FaLinkedin
 } from 'react-icons/fa';
 
 const About = () => {
@@ -163,7 +164,7 @@ const About = () => {
           >
             <h1 className="text-5xl font-bold mb-6">About Fabtech Inc</h1>
             <p className="text-xl text-light-teal max-w-4xl mx-auto leading-relaxed">
-            Fabtech Inc is an innovation-led, trusted partner for sales, service, and distribution across hospitals, laboratories, and medical device organizations. Based in Ahmedabad, Gujarat, our focus spans medical and hospital equipment, surgical and biomedical systems, diagnostic technologies, and essential medical supplies. Featuring solutions from Abbott and other world-class manufacturers, we are the preferred choice for healthcare institutions that prioritize reliability and excellence. And we don’t stop at distribution—our dedicated service network and customer-first approach ensure every biomedical and surgical device performs to international standards, because in healthcare, precision and trust save lives.
+            Fabtech Inc is an innovation-led, trusted partner for sales, service, and distribution across hospitals, laboratories, and medical device organizations. Based in Ahmedabad, Gujarat, our focus spans medical and hospital equipment, surgical and biomedical systems, diagnostic technologies, and essential medical supplies. Featuring solutions from Abbott and other world-class manufacturers, we are the preferred choice for healthcare institutions that prioritize reliability and excellence. And we don’t stop at distribution our dedicated service network and customer first approach ensure every biomedical and surgical device performs to international standards, because in healthcare, precision and trust save lives.
             </p>
             <div className="mt-8">
               <span className="inline-block bg-white bg-opacity-20 px-6 py-2 rounded-full text-lg font-medium">
@@ -485,7 +486,7 @@ const About = () => {
               whileInView={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
               viewport={{ once: true }}
-              className="card p-8 bg-white/90 backdrop-blur border border-teal-100"
+              className="card p-8 bg-white/90 backdrop-blur border border-teal-100 h-full"
             >
               <div className="prose max-w-none">
                 <p className="text-gray-700 text-lg leading-relaxed mb-4">
@@ -503,7 +504,7 @@ const About = () => {
               whileInView={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
-              className="card p-8 bg-gradient-to-br from-teal-50 to-sky-50 border border-teal-200 hover:shadow-xl transition-shadow duration-300 h-full"
+              className="card p-8 bg-gradient-to-br from-teal-50 to-sky-50 border border-teal-200 hover:shadow-xl transition-shadow duration-300 h-full flex flex-col"
             >
               <div className="flex flex-col items-center justify-center text-center h-full">
                 <div className="relative mb-8">
@@ -517,7 +518,18 @@ const About = () => {
                 </div>
                 
                 <h3 className="text-3xl font-bold text-gray-900 mb-3">Pratik Oza</h3>
-                <p className="text-teal-700 font-semibold text-xl">Founder & Director</p>
+                <p className="text-teal-700 font-semibold text-xl mb-4">Founder & Director</p>
+                
+                {/* LinkedIn Profile Link */}
+                <a 
+                  href="https://www.linkedin.com/in/pratik-oza-20b20844/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors duration-300 shadow-md hover:shadow-lg"
+                >
+                  <FaLinkedin className="text-xl" />
+                  <span className="font-medium">Connect on LinkedIn</span>
+                </a>
               </div>
             </motion.div>
           </div>

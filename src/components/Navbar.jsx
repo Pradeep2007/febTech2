@@ -27,28 +27,34 @@ const Navbar = () => {
 
   // Function to handle navigation
   const handleNavigation = (item, e) => {
+    // Close mobile menu first
+    setIsOpen(false);
+    
     // If we're on the home page and the section exists, scroll to it
     if (location.pathname === '/' && document.getElementById(item.sectionId)) {
       e.preventDefault();
-      const element = document.getElementById(item.sectionId);
       
-      // Get the navbar height to offset the scroll position
-      const navbar = document.querySelector('nav');
-      const navbarHeight = navbar ? navbar.offsetHeight : 80;
-      
-      // Calculate the exact position to scroll to
-      const elementPosition = element.offsetTop;
-      const offsetPosition = elementPosition - navbarHeight;
-      
-      // Scroll to the exact position
-      window.scrollTo({
-        top: Math.max(0, offsetPosition),
-        behavior: 'smooth'
-      });
-      
-      setIsOpen(false);
+      // Add small delay for mobile to ensure smooth scrolling
+      setTimeout(() => {
+        const element = document.getElementById(item.sectionId);
+        if (element) {
+          // Get the navbar height to offset the scroll position
+          const navbar = document.querySelector('nav');
+          const navbarHeight = navbar ? navbar.offsetHeight : 80;
+          
+          // Calculate the exact position to scroll to
+          const elementPosition = element.offsetTop;
+          const offsetPosition = elementPosition - navbarHeight;
+          
+          // Scroll to the exact position
+          window.scrollTo({
+            top: Math.max(0, offsetPosition),
+            behavior: 'smooth'
+          });
+        }
+      }, 100);
     }
-    // Otherwise, navigate normally (handled by Link)
+    // For navigation to other pages, let Link handle it normally
   };
 
   // Determine if item should be active
@@ -71,7 +77,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-40">
+    <nav className="bg-white shadow-lg fixed top-0 left-0 right-0 z-50">
       <div className="container-max">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
