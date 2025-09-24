@@ -199,5 +199,85 @@ export const sampleProducts = [
     inStock: true,
     stockQuantity: 180,
     image: '/api/placeholder/400/300'
+  },
+  {
+    id: 'sample-7',
+    name: 'Alinity ci-series Immunoassay Analyzer',
+    category: 'Harmone analyzer',
+    subcategory: 'Alinity family',
+    brand: 'Abbott',
+    sku: 'ABT-ALN-CI-001',
+    price: 125000.00,
+    description: 'High-throughput immunoassay analyzer for hormone and protein testing with advanced automation.',
+    specifications: {
+      'Throughput': '200 tests/hour',
+      'Sample Types': 'Serum, Plasma, Urine',
+      'Test Menu': '100+ assays',
+      'Sample Volume': '25-100μL',
+      'Automation': 'Fully automated'
+    },
+    inStock: true,
+    stockQuantity: 2,
+    image: '/api/placeholder/400/300'
+  },
+  {
+    id: 'sample-8',
+    name: 'Architect i2000SR Immunoassay System',
+    category: 'Harmone analyzer',
+    subcategory: 'Architect family',
+    brand: 'Abbott',
+    sku: 'ABT-ARC-I2000',
+    price: 95000.00,
+    description: 'Compact immunoassay system for hormone analysis with STAT capability.',
+    specifications: {
+      'Throughput': '100 tests/hour',
+      'Sample Types': 'Serum, Plasma',
+      'Test Menu': '80+ assays',
+      'Sample Volume': '25-200μL',
+      'STAT Time': '18 minutes'
+    },
+    inStock: true,
+    stockQuantity: 3,
+    image: '/api/placeholder/400/300'
+  },
+  {
+    id: 'sample-9',
+    name: 'Clinical Chemistry Analyzer Pro',
+    category: 'Biochemistry analyzer',
+    subcategory: '',
+    brand: 'Sysmax-Biosystems',
+    sku: 'SYS-BIO-PRO-001',
+    price: 75000.00,
+    description: 'Advanced biochemistry analyzer for comprehensive metabolic panels and routine chemistry testing.',
+    specifications: {
+      'Throughput': '400 tests/hour',
+      'Sample Types': 'Serum, Plasma, Urine',
+      'Test Menu': '200+ parameters',
+      'Sample Volume': '2-35μL',
+      'Reagent Positions': '120'
+    },
+    inStock: true,
+    stockQuantity: 4,
+    image: '/api/placeholder/400/300'
+  },
+  {
+    id: 'sample-10',
+    name: 'Automated Biochemistry Workstation',
+    category: 'Biochemistry analyzer',
+    subcategory: '',
+    brand: 'Rest Inc.',
+    sku: 'REST-BIO-WS-002',
+    price: 85000.00,
+    description: 'High-capacity biochemistry analyzer with integrated sample handling and quality control.',
+    specifications: {
+      'Throughput': '800 tests/hour',
+      'Sample Types': 'Serum, Plasma, Whole Blood',
+      'Test Menu': '150+ parameters',
+      'Sample Volume': '1.5-25μL',
+      'Quality Control': 'Integrated QC system'
+    },
+    inStock: true,
+    stockQuantity: 1,
+    image: '/api/placeholder/400/300'
   }
 ];

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   FaFilter, 
@@ -11,6 +12,8 @@ import {
 import { getProducts, sampleProducts } from '../services/productService';
 
 const Products = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +25,18 @@ const Products = () => {
     loadProducts();
   }, []);
 
+  // Handle URL query parameters
   useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const filterParam = searchParams.get('filter');
+    if (filterParam) {
+      console.log('Setting category from URL:', filterParam);
+      setSelectedCategory(filterParam);
+    }
+  }, [location.search]);
+
+  useEffect(() => {
+    console.log('useEffect triggered:', { products: products.length, searchTerm, selectedCategory });
     filterProducts();
   }, [products, searchTerm, selectedCategory]);
 
@@ -47,7 +61,20 @@ const Products = () => {
   };
 
   const filterProducts = () => {
-    let filtered = products;
+    console.log('filterProducts called with:', { 
+      productsLength: products.length, 
+      selectedCategory, 
+      searchTerm 
+    });
+
+    // If no products, set empty filtered array
+    if (!products || products.length === 0) {
+      console.log('No products loaded yet, setting empty array');
+      setFilteredProducts([]);
+      return;
+    }
+
+    let filtered = [...products]; // Create a copy
 
     // Filter by search term
     if (searchTerm) {
@@ -58,17 +85,73 @@ const Products = () => {
       );
     }
 
-    // Filter by category
-    if (selectedCategory !== 'All') {
-      filtered = filtered.filter(product => product.category === selectedCategory);
+    // Filter by category or subcategory
+    if (selectedCategory && selectedCategory !== 'All') {
+      console.log('Filtering by category:', selectedCategory);
+      console.log('Available products:', filtered.map(p => ({ 
+        name: p.name, 
+        category: p.category, 
+        subcategory: p.subcategory 
+      })));
+      
+      const beforeCount = filtered.length;
+      filtered = filtered.filter(product => 
+        product.category === selectedCategory || 
+        product.subcategory === selectedCategory
+      );
+      
+      console.log(`Filtered from ${beforeCount} to ${filtered.length} products`);
+      console.log('Matching products:', filtered.map(p => p.name));
     }
 
-    // Brand filter removed (showcase only)
-
+    console.log('Setting filtered products:', filtered.length);
     setFilteredProducts(filtered);
   };
 
-  const categories = ['All', ...new Set(products.map(p => p.category))].filter(Boolean);
+  // Structured categories with subcategories
+  const categoryStructure = [
+    {
+      name: 'All',
+      value: 'All',
+      isCategory: true
+    },
+    {
+      name: 'Harmone analyzer',
+      value: 'Harmone analyzer',
+      isCategory: true,
+      subcategories: [
+        { name: 'Alinity family', value: 'Alinity family' },
+        { name: 'Architect family', value: 'Architect family' }
+      ]
+    },
+    {
+      name: 'Biochemistry analyzer',
+      value: 'Biochemistry analyzer',
+      isCategory: true,
+      subcategories: []
+    }
+  ];
+
+  // Get other categories from products (Equipment, Medicines, etc.) - excluding the ones we already defined
+  const predefinedCategories = ['Harmone analyzer', 'Biochemistry analyzer'];
+  const productCategories = [...new Set(products.map(p => p.category))].filter(Boolean);
+  
+  // Filter out predefined categories (case-insensitive)
+  const otherCategories = productCategories
+    .filter(cat => !predefinedCategories.some(predefined => 
+      predefined.toLowerCase() === cat.toLowerCase()
+    ))
+    .map(cat => ({
+      name: cat,
+      value: cat,
+      isCategory: true,
+      subcategories: [...new Set(products.filter(p => p.category === cat).map(p => p.subcategory))]
+        .filter(Boolean)
+        .map(sub => ({ name: sub, value: sub }))
+    }));
+
+  const allCategories = [...categoryStructure, ...otherCategories];
+  console.log('Generated categories:', allCategories);
 
   const ProductCard = ({ product }) => (
     <motion.div
@@ -250,7 +333,7 @@ const Products = () => {
       transition={{ duration: 0.5 }}
     >
       {/* Hero Section */}
-      <section className="gradient-bg text-white section-padding">
+      <section className="gradient-bg text-white section-padding pt-20 md:pt-24 lg:pt-28">
         <div className="container-max text-center">
           <motion.div
             initial={{ y: 50, opacity: 0 }}
@@ -267,7 +350,7 @@ const Products = () => {
       </section>
 
       {/* Filters Section */}
-      <section className="bg-white py-8 sticky top-16 z-30 shadow-sm">
+      <section className="bg-white py-8 sticky top-14 md:top-16 lg:top-16 z-30 shadow-sm">
         <div className="container-max">
           <div className="flex flex-col lg:flex-row gap-4 items-center">
             {/* Search */}
@@ -287,11 +370,21 @@ const Products = () => {
               <FaFilter className="text-gray-500" />
               <select
                 value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
+                onChange={(e) => {
+                  console.log('Dropdown changed to:', e.target.value);
+                  setSelectedCategory(e.target.value);
+                }}
                 className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-prime focus:border-transparent"
               >
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
+                {allCategories.map((category) => (
+                  <React.Fragment key={category.name}>
+                    <option value={category.value}>{category.name}</option>
+                    {category.subcategories && category.subcategories.map((sub) => (
+                      <option key={sub.value} value={sub.value}>
+                        &nbsp;&nbsp;&nbsp;&nbsp;↳ {sub.name}
+                      </option>
+                    ))}
+                  </React.Fragment>
                 ))}
               </select>
             </div>

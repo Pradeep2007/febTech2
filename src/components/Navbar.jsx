@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo1.png';
 import { motion } from 'framer-motion';
-import { FaBars, FaTimes, FaUserShield } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUserShield, FaChevronDown } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import useScrollSpy from '../hooks/useScrollSpy';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
+  const [dropdownTimeout, setDropdownTimeout] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { isAdmin, logout } = useAuth();
 
   // Define sections for scroll spy (only on home page)
@@ -19,11 +22,52 @@ const Navbar = () => {
     { name: 'Home', path: '/', sectionId: 'home' },
     { name: 'About', path: '/about', sectionId: 'about' },
     { name: 'Members', path: '/members', sectionId: 'members' },
-    { name: 'Products', path: '/products', sectionId: 'products' },
+    { name: 'Products', path: '/products', sectionId: 'products', hasDropdown: true },
     { name: 'Clients', path: '/clients', sectionId: 'clients' },
     { name: 'FAQ', path: '/faq', sectionId: 'faq' },
     { name: 'Contact', path: '/contact', sectionId: 'contact' },
   ];
+
+  // Product categories and subcategories (matching Products.jsx)
+  const productCategories = [
+    {
+      name: 'Harmone analyzer',
+      filter: 'Harmone analyzer',
+      subcategories: [
+        { name: 'Alinity family', filter: 'Alinity family' },
+        { name: 'Architect family', filter: 'Architect family' }
+      ]
+    },
+    {
+      name: 'Biochemistry analyzer',
+      filter: 'Biochemistry analyzer',
+      subcategories: []
+    }
+  ];
+
+  // Function to handle dropdown open
+  const handleDropdownEnter = () => {
+    if (dropdownTimeout) {
+      clearTimeout(dropdownTimeout);
+      setDropdownTimeout(null);
+    }
+    setIsProductsDropdownOpen(true);
+  };
+
+  // Function to handle dropdown close with delay
+  const handleDropdownLeave = () => {
+    const timeout = setTimeout(() => {
+      setIsProductsDropdownOpen(false);
+    }, 150); // 150ms delay
+    setDropdownTimeout(timeout);
+  };
+
+  // Function to handle category navigation
+  const handleCategoryNavigation = (filter) => {
+    setIsProductsDropdownOpen(false);
+    setIsOpen(false);
+    navigate(`/products?filter=${encodeURIComponent(filter)}`);
+  };
 
   // Function to handle navigation
   const handleNavigation = (item, e) => {
@@ -79,7 +123,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-lg fixed top-0 left-0 right-0 z-50">
       <div className="container-max">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center py-3 md:py-4">
           {/* Logo */}
           <Link 
             to="/" 
@@ -108,24 +152,96 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
             {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                onClick={(e) => handleNavigation(item, e)}
-                className={`relative font-medium transition-colors duration-300 ${
-                  isItemActive(item)
-                    ? 'text-teal-prime'
-                    : 'text-gray-700 hover:text-teal-prime'
-                }`}
-              >
-                {item.name}
-                {isItemActive(item) && (
+              item.hasDropdown ? (
+                <div
+                  key={item.name}
+                  className="relative"
+                  onMouseEnter={handleDropdownEnter}
+                  onMouseLeave={handleDropdownLeave}
+                >
+                  <Link
+                    to={item.path}
+                    onClick={(e) => handleNavigation(item, e)}
+                    className={`relative font-medium transition-colors duration-300 flex items-center gap-1 ${
+                      isItemActive(item)
+                        ? 'text-teal-prime'
+                        : 'text-gray-700 hover:text-teal-prime'
+                    }`}
+                  >
+                    {item.name}
+                    <FaChevronDown className={`text-xs transition-transform duration-200 ${
+                      isProductsDropdownOpen ? 'rotate-180' : ''
+                    }`} />
+                    {isItemActive(item) && (
+                      <motion.div
+                        className="absolute -bottom-1 left-0 right-0 h-0.5 bg-teal-prime"
+                        layoutId="underline"
+                      />
+                    )}
+                  </Link>
+
+                  {/* Dropdown Menu */}
                   <motion.div
-                    className="absolute -bottom-1 left-0 right-0 h-0.5 bg-teal-prime"
-                    layoutId="underline"
-                  />
-                )}
-              </Link>
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ 
+                      opacity: isProductsDropdownOpen ? 1 : 0, 
+                      y: isProductsDropdownOpen ? 0 : -10 
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className={`absolute top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 ${
+                      isProductsDropdownOpen ? 'pointer-events-auto' : 'pointer-events-none'
+                    }`}
+                    onMouseEnter={handleDropdownEnter}
+                    onMouseLeave={handleDropdownLeave}
+                  >
+                    <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
+                      Categories
+                    </div>
+                    {productCategories.map((category) => (
+                      <div key={category.name}>
+                        <button
+                          onClick={() => handleCategoryNavigation(category.filter)}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-prime transition-colors"
+                        >
+                          {category.name}
+                        </button>
+                        {category.subcategories.length > 0 && (
+                          <div className="ml-4 border-l border-gray-200">
+                            {category.subcategories.map((subcategory) => (
+                              <button
+                                key={subcategory.name}
+                                onClick={() => handleCategoryNavigation(subcategory.filter)}
+                                className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-teal-prime transition-colors"
+                              >
+                                {subcategory.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </motion.div>
+                </div>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  onClick={(e) => handleNavigation(item, e)}
+                  className={`relative font-medium transition-colors duration-300 ${
+                    isItemActive(item)
+                      ? 'text-teal-prime'
+                      : 'text-gray-700 hover:text-teal-prime'
+                  }`}
+                >
+                  {item.name}
+                  {isItemActive(item) && (
+                    <motion.div
+                      className="absolute -bottom-1 left-0 right-0 h-0.5 bg-teal-prime"
+                      layoutId="underline"
+                    />
+                  )}
+                </Link>
+              )
             ))}
           </div>
 
@@ -146,18 +262,62 @@ const Navbar = () => {
         >
           <div className="py-4 space-y-4">
             {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                onClick={(e) => handleNavigation(item, e)}
-                className={`block font-medium transition-colors duration-300 ${
-                  isItemActive(item)
-                    ? 'text-teal-prime'
-                    : 'text-gray-700 hover:text-teal-prime'
-                }`}
-              >
-                {item.name}
-              </Link>
+              item.hasDropdown ? (
+                <div key={item.name} className="space-y-2">
+                  <Link
+                    to={item.path}
+                    onClick={(e) => handleNavigation(item, e)}
+                    className={`block font-medium transition-colors duration-300 ${
+                      isItemActive(item)
+                        ? 'text-teal-prime'
+                        : 'text-gray-700 hover:text-teal-prime'
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                  <div className="ml-4 space-y-2 border-l border-gray-200 pl-4">
+                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Categories
+                    </div>
+                    {productCategories.map((category) => (
+                      <div key={category.name} className="space-y-1">
+                        <button
+                          onClick={() => handleCategoryNavigation(category.filter)}
+                          className="block text-sm text-gray-700 hover:text-teal-prime transition-colors"
+                        >
+                          {category.name}
+                        </button>
+                        {category.subcategories.length > 0 && (
+                          <div className="ml-4 space-y-1">
+                            {category.subcategories.map((subcategory) => (
+                              <button
+                                key={subcategory.name}
+                                onClick={() => handleCategoryNavigation(subcategory.filter)}
+                                className="block text-sm text-gray-600 hover:text-teal-prime transition-colors"
+                              >
+                                {subcategory.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  onClick={(e) => handleNavigation(item, e)}
+                  className={`block font-medium transition-colors duration-300 ${
+                    isItemActive(item)
+                      ? 'text-teal-prime'
+                      : 'text-gray-700 hover:text-teal-prime'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
           </div>
         </motion.div>
