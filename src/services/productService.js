@@ -6,7 +6,8 @@ import {
   updateDoc, 
   deleteDoc, 
   query, 
-  orderBy 
+  orderBy,
+  where 
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { deleteImageFromCloudinary } from './cloudinaryService';
@@ -281,3 +282,71 @@ export const sampleProducts = [
     image: '/api/placeholder/400/300'
   }
 ];
+
+// Get products filtered by category
+export const getProductsByCategory = async (categoryName) => {
+  try {
+    const q = query(
+      collection(db, COLLECTION_NAME), 
+      where('category', '==', categoryName),
+      orderBy('createdAt', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    const products = [];
+    querySnapshot.forEach((doc) => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
+    return products;
+  } catch (error) {
+    console.error('Error fetching products by category:', error);
+    throw error;
+  }
+};
+
+// Get products filtered by subcategory
+export const getProductsBySubcategory = async (subcategoryName) => {
+  try {
+    const q = query(
+      collection(db, COLLECTION_NAME), 
+      where('subcategory', '==', subcategoryName),
+      orderBy('createdAt', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    const products = [];
+    querySnapshot.forEach((doc) => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
+    return products;
+  } catch (error) {
+    console.error('Error fetching products by subcategory:', error);
+    throw error;
+  }
+};
+
+// Get unique categories from products
+export const getProductCategories = async () => {
+  try {
+    const products = await getProducts();
+    const categories = [...new Set(products.map(p => p.category))].filter(Boolean);
+    return categories;
+  } catch (error) {
+    console.error('Error getting product categories:', error);
+    return [];
+  }
+};
+
+// Get subcategories for a specific category
+export const getSubcategoriesForCategory = async (categoryName) => {
+  try {
+    const products = await getProducts();
+    const subcategories = [...new Set(
+      products
+        .filter(p => p.category === categoryName)
+        .map(p => p.subcategory)
+    )].filter(Boolean);
+    return subcategories;
+  } catch (error) {
+    console.error('Error getting subcategories for category:', error);
+    return [];
+  }
+};

@@ -10,12 +10,14 @@ import {
   FaFileAlt
 } from 'react-icons/fa';
 import { getProducts, sampleProducts } from '../services/productService';
+import { getCategoriesWithFallback } from '../services/categoryService';
 
 const Products = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -43,18 +45,23 @@ const Products = () => {
   const loadProducts = async () => {
     try {
       setLoading(true);
-      let productData = await getProducts();
+      
+      // Load products and categories in parallel
+      const [productData, categoryData] = await Promise.all([
+        getProducts(),
+        getCategoriesWithFallback()
+      ]);
       
       // If no products in Firebase, use sample data
-      if (productData.length === 0) {
-        productData = sampleProducts;
-      }
+      const finalProducts = productData.length === 0 ? sampleProducts : productData;
       
-      setProducts(productData);
+      setProducts(finalProducts);
+      setCategories(categoryData);
     } catch (error) {
-      console.error('Error loading products:', error);
+      console.error('Error loading data:', error);
       // Fallback to sample data
       setProducts(sampleProducts);
+      setCategories([]);
     } finally {
       setLoading(false);
     }
@@ -78,11 +85,21 @@ const Products = () => {
 
     // Filter by search term
     if (searchTerm) {
+      console.log('Searching for:', searchTerm);
+      const beforeSearchCount = filtered.length;
       filtered = filtered.filter(product =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.sku.toLowerCase().includes(searchTerm.toLowerCase())
+        product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (product.category && product.category.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (product.subcategory && product.subcategory.toLowerCase().includes(searchTerm.toLowerCase()))
       );
+      console.log(`Search filtered from ${beforeSearchCount} to ${filtered.length} products`);
+      console.log('Search results:', filtered.map(p => ({ 
+        name: p.name, 
+        category: p.category, 
+        subcategory: p.subcategory 
+      })));
     }
 
     // Filter by category or subcategory
@@ -108,49 +125,20 @@ const Products = () => {
     setFilteredProducts(filtered);
   };
 
-  // Structured categories with subcategories
-  const categoryStructure = [
+  // Generate category options from loaded categories
+  const allCategories = [
     {
       name: 'All',
       value: 'All',
       isCategory: true
     },
-    {
-      name: 'Harmone analyzer',
-      value: 'Harmone analyzer',
+    ...categories.filter(category => category.isActive).map(category => ({
+      name: category.name,
+      value: category.name,
       isCategory: true,
-      subcategories: [
-        { name: 'Alinity family', value: 'Alinity family' },
-        { name: 'Architect family', value: 'Architect family' }
-      ]
-    },
-    {
-      name: 'Biochemistry analyzer',
-      value: 'Biochemistry analyzer',
-      isCategory: true,
-      subcategories: []
-    }
+      subcategories: category.subcategories ? category.subcategories.map(sub => ({ name: sub, value: sub })) : []
+    }))
   ];
-
-  // Get other categories from products (Equipment, Medicines, etc.) - excluding the ones we already defined
-  const predefinedCategories = ['Harmone analyzer', 'Biochemistry analyzer'];
-  const productCategories = [...new Set(products.map(p => p.category))].filter(Boolean);
-  
-  // Filter out predefined categories (case-insensitive)
-  const otherCategories = productCategories
-    .filter(cat => !predefinedCategories.some(predefined => 
-      predefined.toLowerCase() === cat.toLowerCase()
-    ))
-    .map(cat => ({
-      name: cat,
-      value: cat,
-      isCategory: true,
-      subcategories: [...new Set(products.filter(p => p.category === cat).map(p => p.subcategory))]
-        .filter(Boolean)
-        .map(sub => ({ name: sub, value: sub }))
-    }));
-
-  const allCategories = [...categoryStructure, ...otherCategories];
   console.log('Generated categories:', allCategories);
 
   const ProductCard = ({ product }) => (

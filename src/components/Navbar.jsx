@@ -1,18 +1,59 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../assets/images/logo1.png';
 import { motion } from 'framer-motion';
-import { FaBars, FaTimes, FaUserShield, FaChevronDown } from 'react-icons/fa';
+import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import useScrollSpy from '../hooks/useScrollSpy';
+import { getCategoriesWithFallback } from '../services/categoryService';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
+  const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
   const [dropdownTimeout, setDropdownTimeout] = useState(null);
+  const [productCategories, setProductCategories] = useState([]);
   const location = useLocation();
   const navigate = useNavigate();
   const { isAdmin, logout } = useAuth();
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categories = await getCategoriesWithFallback();
+        console.log('Navbar loaded categories:', categories);
+        setProductCategories(categories);
+      } catch (error) {
+        console.error('Error loading categories in navbar:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Add function to refresh categories (can be called from admin)
+  const refreshCategories = async () => {
+    try {
+      const categories = await getCategoriesWithFallback();
+      console.log('Navbar refreshed categories:', categories);
+      setProductCategories(categories);
+    } catch (error) {
+      console.error('Error refreshing categories:', error);
+    }
+  };
+
+  // Listen for category updates (optional - for real-time updates)
+  useEffect(() => {
+    const handleCategoryUpdate = () => {
+      refreshCategories();
+    };
+    
+    // Listen for custom event
+    window.addEventListener('categoriesUpdated', handleCategoryUpdate);
+    
+    return () => {
+      window.removeEventListener('categoriesUpdated', handleCategoryUpdate);
+    };
+  }, []);
 
   // Define sections for scroll spy (only on home page)
   const sectionIds = ['home', 'about', 'members', 'products', 'clients', 'faq', 'contact'];
@@ -28,24 +69,8 @@ const Navbar = () => {
     { name: 'Contact', path: '/contact', sectionId: 'contact' },
   ];
 
-  // Product categories and subcategories (matching Products.jsx)
-  const productCategories = [
-    {
-      name: 'Harmone analyzer',
-      filter: 'Harmone analyzer',
-      subcategories: [
-        { name: 'Alinity family', filter: 'Alinity family' },
-        { name: 'Architect family', filter: 'Architect family' }
-      ]
-    },
-    {
-      name: 'Biochemistry analyzer',
-      filter: 'Biochemistry analyzer',
-      subcategories: []
-    }
-  ];
 
-  // Function to handle dropdown open
+  // Function to handle dropdown enter
   const handleDropdownEnter = () => {
     if (dropdownTimeout) {
       clearTimeout(dropdownTimeout);
@@ -62,10 +87,17 @@ const Navbar = () => {
     setDropdownTimeout(timeout);
   };
 
+  // Function to toggle mobile products dropdown
+  const toggleMobileProducts = () => {
+    setIsMobileProductsOpen(!isMobileProductsOpen);
+  };
+
   // Function to handle category navigation
   const handleCategoryNavigation = (filter) => {
+    console.log('Navigating to category:', filter);
     setIsProductsDropdownOpen(false);
     setIsOpen(false);
+    setIsMobileProductsOpen(false);
     navigate(`/products?filter=${encodeURIComponent(filter)}`);
   };
 
@@ -145,7 +177,7 @@ const Navbar = () => {
               alt="Fabtech Inc logo"
               className="h-10 w-auto md:h-12 object-contain"
               loading="eager"
-              fetchpriority="high"
+              fetchPriority="high"
             />
           </Link>
 
@@ -188,32 +220,41 @@ const Navbar = () => {
                       y: isProductsDropdownOpen ? 0 : -10 
                     }}
                     transition={{ duration: 0.2 }}
-                    className={`absolute top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 ${
+                    className={`absolute top-full left-0 mt-0 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 ${
                       isProductsDropdownOpen ? 'pointer-events-auto' : 'pointer-events-none'
                     }`}
-                    onMouseEnter={handleDropdownEnter}
                     onMouseLeave={handleDropdownLeave}
                   >
                     <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide border-b border-gray-100">
                       Categories
                     </div>
-                    {productCategories.map((category) => (
+                    {productCategories.filter(category => category.isActive).map((category) => (
                       <div key={category.name}>
                         <button
-                          onClick={() => handleCategoryNavigation(category.filter)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Main category clicked:', category.name);
+                            handleCategoryNavigation(category.name);
+                          }}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-teal-prime transition-colors"
                         >
                           {category.name}
                         </button>
-                        {category.subcategories.length > 0 && (
+                        {category.subcategories && category.subcategories.length > 0 && (
                           <div className="ml-4 border-l border-gray-200">
                             {category.subcategories.map((subcategory) => (
                               <button
-                                key={subcategory.name}
-                                onClick={() => handleCategoryNavigation(subcategory.filter)}
+                                key={subcategory}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  console.log('Subcategory clicked:', subcategory);
+                                  handleCategoryNavigation(subcategory);
+                                }}
                                 className="w-full text-left px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-teal-prime transition-colors"
                               >
-                                {subcategory.name}
+                                {subcategory}
                               </button>
                             ))}
                           </div>
@@ -224,7 +265,6 @@ const Navbar = () => {
                 </div>
               ) : (
                 <Link
-                  key={item.name}
                   to={item.path}
                   onClick={(e) => handleNavigation(item, e)}
                   className={`relative font-medium transition-colors duration-300 ${
@@ -264,45 +304,73 @@ const Navbar = () => {
             {navItems.map((item) => (
               item.hasDropdown ? (
                 <div key={item.name} className="space-y-2">
-                  <Link
-                    to={item.path}
-                    onClick={(e) => handleNavigation(item, e)}
-                    className={`block font-medium transition-colors duration-300 ${
-                      isItemActive(item)
-                        ? 'text-teal-prime'
-                        : 'text-gray-700 hover:text-teal-prime'
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                  <div className="ml-4 space-y-2 border-l border-gray-200 pl-4">
-                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                      Categories
-                    </div>
-                    {productCategories.map((category) => (
+                  <div className="flex items-center gap-2">
+                    <Link
+                      to={item.path}
+                      onClick={(e) => handleNavigation(item, e)}
+                      className={`block font-medium transition-colors duration-300 ${
+                        isItemActive(item)
+                          ? 'text-teal-prime'
+                          : 'text-gray-700 hover:text-teal-prime'
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                    <button
+                      onClick={toggleMobileProducts}
+                      className="p-1 text-gray-600 hover:text-teal-prime transition-colors"
+                    >
+                      <FaChevronDown className={`text-sm transition-transform duration-200 ${
+                        isMobileProductsOpen ? 'rotate-180' : ''
+                      }`} />
+                    </button>
+                  </div>
+                  {isMobileProductsOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="ml-4 space-y-2 border-l border-gray-200 pl-4"
+                    >
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        Categories
+                      </div>
+                      {productCategories.filter(category => category.isActive).map((category) => (
                       <div key={category.name} className="space-y-1">
                         <button
-                          onClick={() => handleCategoryNavigation(category.filter)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            console.log('Mobile category clicked:', category.name);
+                            handleCategoryNavigation(category.name);
+                          }}
                           className="block text-sm text-gray-700 hover:text-teal-prime transition-colors"
                         >
                           {category.name}
                         </button>
-                        {category.subcategories.length > 0 && (
+                        {category.subcategories && category.subcategories.length > 0 && (
                           <div className="ml-4 space-y-1">
                             {category.subcategories.map((subcategory) => (
                               <button
-                                key={subcategory.name}
-                                onClick={() => handleCategoryNavigation(subcategory.filter)}
+                                key={subcategory}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  console.log('Mobile subcategory clicked:', subcategory);
+                                  handleCategoryNavigation(subcategory);
+                                }}
                                 className="block text-sm text-gray-600 hover:text-teal-prime transition-colors"
                               >
-                                {subcategory.name}
+                                {subcategory}
                               </button>
                             ))}
                           </div>
                         )}
                       </div>
                     ))}
-                  </div>
+                    </motion.div>
+                  )}
                 </div>
               ) : (
                 <Link
