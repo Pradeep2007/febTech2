@@ -1,22 +1,8 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useEffect, useState } from 'react';
-import client1 from '../assets/images/client1.jpg'
-import client2 from '../assets/images/client2.jpg'
-import client3 from '../assets/images/client3.jpg'
-import client4 from '../assets/images/client4.jpg'
-import client5 from '../assets/images/client5.png'
-import client6 from '../assets/images/client6.png'
-import client7 from '../assets/images/client7.jpg'
-import client8 from '../assets/images/client8.png'
+import { getActiveClients } from '../services/clientService';
 import { 
-  FaHospital, 
-  FaFlask, 
-  FaPills, 
-  FaMapMarkerAlt,
-  FaAward,
-  FaHandshake,
-  FaMicroscope,
-  FaHeartbeat
+  FaUsers
 } from 'react-icons/fa';
 
 const Clients = () => {
@@ -98,130 +84,31 @@ const Clients = () => {
       </motion.div>
     );
   };
-  // Unified clients array - all clients in one list
-  const allClients = [
-    {
-      name: 'Civil Hospital Amdabad',
-      logo: client1
-    },
-    {
-      name: 'U.N. Mehta Institute of Cardiology and Research Center',
-      logo: client6
-    },
-    {
-      name: 'Government Medical College, Bhavnagar',
-      logo: client8
-    },
-    {
-      name: 'Cliantha Clinical Research',
-      logo: client3
-    },
-    {
-      name: 'Lambda Research Accelerated',
-      logo: client5
-    },
-    {
-      name: 'Shalby Multi-Specialty Care',
-      logo: client7
-    },
-    {
-      name: 'Sanjeevani Pathology Laboratory',
-      logo: client2
-    },
-    {
-      name: 'Intas Pharmaceuticals',
-      logo: client4
-    }
-  ];
 
-  const testimonials = [
-    {
-      quote: "FabTech has been an invaluable partner in our mission to provide exceptional patient care. Their commitment to quality and compliance gives us complete confidence in every product we receive.",
-      author: "Dr. Sarah Mitchell",
-      position: "Chief Medical Officer",
-      organization: "Metropolitan General Hospital",
-      rating: 5
-    },
-    {
-      quote: "The level of service and expertise FabTech provides is unmatched. They understand our unique needs as an academic medical center and consistently deliver solutions that support both patient care and research.",
-      author: "Dr. Michael Chen",
-      position: "Director of Procurement",
-      organization: "University Health System",
-      rating: 5
-    },
-    {
-      quote: "Working with FabTech has streamlined our supply chain operations significantly. Their digital platform and responsive customer service have made ordering and inventory management effortless.",
-      author: "Jennifer Rodriguez",
-      position: "Supply Chain Manager",
-      organization: "Regional Medical Center",
-      rating: 5
-    },
-    {
-      quote: "As a community health network, we need partners who understand our budget constraints without compromising on quality. FabTech delivers exactly that - premium products at competitive prices.",
-      author: "Dr. Robert Thompson",
-      position: "Network Administrator",
-      organization: "Community Health Partners",
-      rating: 5
-    }
-  ];
+  // State for clients data
+  const [allClients, setAllClients] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const partnerBrands = [
-    {
-      name: 'Johnson & Johnson',
-      category: 'Medical Devices & Pharmaceuticals',
-      partnership: 'Authorized Distributor',
-      logo: 'J&J'
-    },
-    {
-      name: 'Pfizer',
-      category: 'Pharmaceutical Products',
-      partnership: 'Strategic Partner',
-      logo: 'PFE'
-    },
-    {
-      name: 'Medtronic',
-      category: 'Medical Technology',
-      partnership: 'Certified Distributor',
-      logo: 'MDT'
-    },
-    {
-      name: 'Abbott',
-      category: 'Diagnostics & Medical Devices',
-      partnership: 'Preferred Partner',
-      logo: 'ABT'
-    },
-    {
-      name: 'Roche',
-      category: 'Diagnostics & Pharmaceuticals',
-      partnership: 'Authorized Distributor',
-      logo: 'ROG'
-    },
-    {
-      name: 'Siemens Healthineers',
-      category: 'Medical Imaging & Diagnostics',
-      partnership: 'Strategic Partner',
-      logo: 'SHL'
-    },
-    {
-      name: 'BD (Becton Dickinson)',
-      category: 'Medical Technology',
-      partnership: 'Certified Distributor',
-      logo: 'BDX'
-    },
-    {
-      name: 'Stryker',
-      category: 'Medical Equipment',
-      partnership: 'Preferred Partner',
-      logo: 'SYK'
-    }
-  ];
+  // Load clients from Firebase
+  useEffect(() => {
+    const loadClients = async () => {
+      try {
+        setLoading(true);
+        const clientsData = await getActiveClients();
+        setAllClients(clientsData);
+      } catch (error) {
+        console.error('Error loading clients:', error);
+        // Fallback to empty array if Firebase fails
+        setAllClients([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const clientStats = [
-    { number: '500+', label: 'Healthcare Clients' },
-    { number: '50+', label: 'Hospital Systems' },
-    { number: '200+', label: 'Clinics & Practices' },
-    { number: '98%', label: 'Client Retention Rate' }
-  ];
+    loadClients();
+  }, []);
+
+
 
 
   return (
@@ -269,40 +156,70 @@ const Clients = () => {
             viewport={{ once: true }}
             className="bg-white rounded-3xl p-8 shadow-lg"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {allClients.map((client, index) => (
-                <motion.div
-                  key={client.name}
-                  initial={{ y: 30, opacity: 0 }}
-                  whileInView={{ y: 0, opacity: 1 }}
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  transition={{ 
-                    duration: 0.5, 
-                    delay: index * 0.1,
-                    type: "spring",
-                    stiffness: 200
-                  }}
-                  viewport={{ once: true }}
-                  className="group"
-                >
-                  <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-teal-200 h-full flex flex-col items-center text-center">
-                    {/* Client Logo */}
-                    <div className="flex-1 flex items-center justify-center p-4 mb-4">
-                      <img 
-                        src={client.logo} 
-                        alt={`${client.name} logo`} 
-                        className="max-w-full max-h-24 object-contain group-hover:scale-105 transition-transform duration-300 shadow-md rounded-lg"
-                      />
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="loading-spinner w-8 h-8 border-4 mr-4"></div>
+                <span className="text-gray-600">Loading clients...</span>
+              </div>
+            ) : allClients.length === 0 ? (
+              <div className="text-center py-12">
+                <FaUsers className="text-6xl text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 text-lg">No clients available at the moment.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {allClients.map((client, index) => (
+                  <motion.div
+                    key={client.id || client.name}
+                    initial={{ y: 30, opacity: 0 }}
+                    whileInView={{ y: 0, opacity: 1 }}
+                    whileHover={{ y: -5, scale: 1.02 }}
+                    transition={{ 
+                      duration: 0.5, 
+                      delay: index * 0.1,
+                      type: "spring",
+                      stiffness: 200
+                    }}
+                    viewport={{ once: true }}
+                    className="group"
+                  >
+                    <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border-2 border-teal-200 h-full flex flex-col items-center text-center">
+                      {/* Client Logo */}
+                      <div className="flex-1 flex items-center justify-center p-4 mb-4">
+                        {client.logoUrl ? (
+                          <img 
+                            src={client.logoUrl} 
+                            alt={`${client.name} logo`} 
+                            className="max-w-full max-h-24 object-contain group-hover:scale-105 transition-transform duration-300 shadow-md rounded-lg"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                        ) : null}
+                        <div 
+                          className={`w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center ${client.logoUrl ? 'hidden' : 'flex'}`}
+                        >
+                          <FaUsers className="text-gray-400 text-2xl" />
+                        </div>
+                      </div>
+                      
+                      {/* Client Name */}
+                      <h4 className="text-lg font-bold text-gray-900 group-hover:text-teal-600 transition-colors mb-2">
+                        {client.name}
+                      </h4>
+                      
+                      {/* Client Description */}
+                      {client.description && (
+                        <p className="text-sm text-gray-600 text-center line-clamp-2">
+                          {client.description}
+                        </p>
+                      )}
                     </div>
-                    
-                    {/* Client Name */}
-                    <h4 className="text-lg font-bold text-gray-900 group-hover:text-teal-600 transition-colors">
-                      {client.name}
-                    </h4>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </motion.div>
         </div>
       </section>

@@ -57,7 +57,7 @@ const BlogList = () => {
       className="min-h-screen bg-light-gray pt-20"
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-teal-prime to-teal-600 text-white py-12 md:py-16">
+      <div className="gradient-bg text-white py-12 md:py-16">
         <div className="container-max">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -66,7 +66,7 @@ const BlogList = () => {
             className="text-center"
           >
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              Our Blog
+              Our Blogs
             </h1>
             <p className="text-lg md:text-xl text-teal-100 max-w-2xl mx-auto">
               Insights, updates, and stories from Fabtech Inc

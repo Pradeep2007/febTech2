@@ -15,7 +15,8 @@ import {
   FaSave,
   FaSearch,
   FaSignOutAlt,
-  FaBlog
+  FaBlog,
+  FaUsers
 } from 'react-icons/fa';
 import { 
   getProducts, 
@@ -37,7 +38,13 @@ import {
   deleteBlog
 } from '../services/blogService';
 import {
-  getCategories,
+  getClients,
+  addClient,
+  updateClient,
+  deleteClient,
+  getClientsWithFallback
+} from '../services/clientService';
+import {
   addCategory,
   updateCategory,
   deleteCategory,
@@ -53,7 +60,6 @@ import {
   generateImagePreview
 } from '../services/cloudinaryService';
 import AdminCategoriesTab from '../components/AdminCategoriesTab';
-import CategoryFormModal from '../components/CategoryFormModal';
 import AdminBlogsTab from '../components/AdminBlogsTab';
 
 const Admin = () => {
@@ -63,6 +69,7 @@ const Admin = () => {
   const [faqs, setFaqs] = useState([]);
   const [blogs, setBlogs] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
@@ -105,11 +112,15 @@ const Admin = () => {
       // Load categories from Firebase
       let categoryData = await getCategoriesWithFallback();
       
-      console.log('Loading data - Products:', productData.length, 'FAQs:', faqData.length, 'Blogs:', blogData.length, 'Categories:', categoryData.length);
+      // Load clients from Firebase
+      let clientData = await getClientsWithFallback();
+      
+      console.log('Loading data - Products:', productData.length, 'FAQs:', faqData.length, 'Blogs:', blogData.length, 'Categories:', categoryData.length, 'Clients:', clientData.length);
       setProducts(productData);
       setFaqs(faqData);
       setBlogs(blogData);
       setCategories(categoryData);
+      setClients(clientData);
     } catch (error) {
       console.error('Error loading data:', error);
       // Fallback to sample data for products, empty for others
@@ -117,6 +128,7 @@ const Admin = () => {
       setFaqs([]);
       setBlogs([]);
       setCategories([]);
+      setClients([]);
     } finally {
       setLoading(false);
     }
@@ -159,6 +171,11 @@ const Admin = () => {
     blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     blog.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     blog.excerpt?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredClients = clients.filter(client =>
+    client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
 
@@ -379,6 +396,112 @@ const Admin = () => {
       imageUrl: '',
       isPublished: true
     });
+  };
+
+  // Client management functions
+  const handleAddClient = () => {
+    setEditingItem(null);
+    setActiveTab('clients');
+    setShowModal(true);
+    reset({
+      name: '',
+      description: '',
+      logoUrl: '',
+      isActive: true
+    });
+    setImagePreview(null);
+  };
+
+  const handleEditClient = (client) => {
+    setEditingItem(client);
+    setActiveTab('clients');
+    setShowModal(true);
+    reset({
+      name: client.name,
+      description: client.description || '',
+      logoUrl: client.logoUrl || '',
+      isActive: client.isActive
+    });
+    setImagePreview(client.logoUrl || null);
+  };
+
+  const handleDeleteClient = async (clientId) => {
+    if (window.confirm('Are you sure you want to delete this client?')) {
+      try {
+        setLoading(true);
+        await deleteClient(clientId);
+        await loadData();
+        toast.success('Client deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting client:', error);
+        toast.error('Error deleting client: ' + error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleSaveClient = async (data) => {
+    try {
+      setLoading(true);
+      
+      // Handle logo upload
+      const logoInput = document.getElementById('client-logo-input');
+      const logoFile = logoInput?.files[0];
+      let logoData = null;
+
+      if (logoFile) {
+        try {
+          setUploadingImage(true);
+          logoData = await uploadImageToCloudinary(logoFile, 'clients');
+          toast.success('Logo uploaded successfully!');
+        } catch (error) {
+          toast.error('Error uploading logo: ' + error.message);
+          return;
+        } finally {
+          setUploadingImage(false);
+        }
+      }
+
+      const clientData = {
+        name: data.name,
+        description: data.description || '',
+        logoUrl: logoData?.url || data.logoUrl || null,
+        logoPublicId: logoData?.publicId || null,
+        logoOriginalName: logoData?.originalName || null,
+        logoSize: logoData?.size || null,
+        logoType: logoData?.type || null,
+        hasLogo: !!(logoData || data.logoUrl),
+        isActive: data.isActive === 'true' || data.isActive === true
+      };
+
+      if (editingItem) {
+        // If no new logo uploaded, keep existing logo data
+        if (!logoFile && editingItem.hasLogo) {
+          clientData.logoUrl = editingItem.logoUrl;
+          clientData.logoPublicId = editingItem.logoPublicId;
+          clientData.logoOriginalName = editingItem.logoOriginalName;
+          clientData.logoSize = editingItem.logoSize;
+          clientData.logoType = editingItem.logoType;
+          clientData.hasLogo = true;
+        }
+        await updateClient(editingItem.id, clientData);
+        toast.success('Client updated successfully!');
+      } else {
+        await addClient(clientData);
+        toast.success('Client added successfully!');
+      }
+
+      await loadData();
+      setShowModal(false);
+      reset();
+      setImagePreview(null);
+    } catch (error) {
+      console.error('Error saving client:', error);
+      toast.error('Error saving client: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEditBlog = (blog) => {
@@ -772,6 +895,19 @@ const Admin = () => {
                 <span className="sm:hidden">Blog</span>
                 <span className="ml-1">({blogs.length})</span>
               </button>
+              <button
+                onClick={() => setActiveTab('clients')}
+                className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+                  activeTab === 'clients'
+                    ? 'border-teal-prime text-teal-prime'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <FaUsers className="inline mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Clients</span>
+                <span className="sm:hidden">Client</span>
+                <span className="ml-1">({clients.length})</span>
+              </button>
             </nav>
           </div>
 
@@ -794,16 +930,17 @@ const Admin = () => {
                   activeTab === 'products' ? handleAddProduct : 
                   activeTab === 'faqs' ? handleAddFaq : 
                   activeTab === 'categories' ? handleAddCategory :
-                  handleAddBlog
+                  activeTab === 'blogs' ? handleAddBlog :
+                  handleAddClient
                 }
                 className="btn-primary flex items-center justify-center text-sm sm:text-base px-3 py-2 sm:px-4"
               >
                 <FaPlus className="mr-2" />
                 <span className="hidden sm:inline">
-                  Add {activeTab === 'products' ? 'Product' : activeTab === 'faqs' ? 'FAQ' : activeTab === 'categories' ? 'Category' : 'Blog'}
+                  Add {activeTab === 'products' ? 'Product' : activeTab === 'faqs' ? 'FAQ' : activeTab === 'categories' ? 'Category' : activeTab === 'blogs' ? 'Blog' : 'Client'}
                 </span>
                 <span className="sm:hidden">
-                  {activeTab === 'products' ? 'Product' : activeTab === 'faqs' ? 'FAQ' : activeTab === 'categories' ? 'Category' : 'Blog'}
+                  {activeTab === 'products' ? 'Product' : activeTab === 'faqs' ? 'FAQ' : activeTab === 'categories' ? 'Category' : activeTab === 'blogs' ? 'Blog' : 'Client'}
                 </span>
               </button>
             </div>
@@ -962,6 +1099,136 @@ const Admin = () => {
               />
             )}
 
+            {/* Clients Tab */}
+            {activeTab === 'clients' && (
+              <div className="space-y-4">
+                {/* Desktop Table View */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Client
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Logo
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Description
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {filteredClients.map((client) => (
+                        <tr key={client.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">{client.name}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {client.logoUrl ? (
+                              <img 
+                                src={client.logoUrl} 
+                                alt={`${client.name} logo`}
+                                className="h-12 w-12 object-contain rounded-lg border border-gray-200"
+                              />
+                            ) : (
+                              <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <FaUsers className="text-gray-400" />
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900 max-w-xs truncate">
+                              {client.description || 'No description'}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              client.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            }`}>
+                              {client.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleEditClient(client)}
+                                className="text-blue-600 hover:text-blue-900 p-1"
+                              >
+                                <FaEdit />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClient(client.id)}
+                                className="text-red-600 hover:text-red-900 p-1"
+                              >
+                                <FaTrash />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Card View */}
+                <div className="md:hidden space-y-3">
+                  {filteredClients.map((client) => (
+                    <div key={client.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center space-x-3">
+                          {client.logoUrl ? (
+                            <img 
+                              src={client.logoUrl} 
+                              alt={`${client.name} logo`}
+                              className="h-12 w-12 object-contain rounded-lg border border-gray-200"
+                            />
+                          ) : (
+                            <div className="h-12 w-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                              <FaUsers className="text-gray-400" />
+                            </div>
+                          )}
+                          <div>
+                            <h3 className="font-medium text-gray-900 text-sm">{client.name}</h3>
+                            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                              client.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                            }`}>
+                              {client.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleEditClient(client)}
+                            className="text-blue-600 hover:text-blue-900 p-1"
+                          >
+                            <FaEdit className="text-sm" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteClient(client.id)}
+                            className="text-red-600 hover:text-red-900 p-1"
+                          >
+                            <FaTrash className="text-sm" />
+                          </button>
+                        </div>
+                      </div>
+                      {client.description && (
+                        <div className="text-sm text-gray-600">
+                          {client.description}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
           </div>
         </div>
       </div>
@@ -981,7 +1248,8 @@ const Admin = () => {
                     activeTab === 'products' ? 'Product' : 
                     activeTab === 'faqs' ? 'FAQ' : 
                     activeTab === 'categories' ? 'Category' :
-                    'Blog'
+                    activeTab === 'blogs' ? 'Blog' :
+                    'Client'
                   }
                 </h3>
                 <button
@@ -1391,6 +1659,92 @@ const Admin = () => {
                     <button type="submit" className="w-full sm:w-auto btn-primary flex items-center justify-center text-sm sm:text-base">
                       <FaSave className="mr-2" />
                       {editingItem ? 'Update' : 'Add'} Blog
+                    </button>
+                  </div>
+                </form>
+              ) : activeTab === 'clients' ? (
+                <form onSubmit={handleSubmit(handleSaveClient)} className="space-y-3 sm:space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Client Name *
+                    </label>
+                    <input
+                      type="text"
+                      {...register('name', { required: 'Client name is required' })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                      placeholder="Enter client name"
+                    />
+                    {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      {...register('description')}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                      placeholder="Enter client description"
+                    />
+                  </div>
+
+                  {/* Client Logo Upload */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Client Logo (JPEG, PNG, WebP - Max 5MB)
+                    </label>
+                    <input
+                      id="client-logo-input"
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      onChange={handleImageChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                    />
+                    <p className="text-gray-500 text-xs mt-1">
+                      Upload a client logo. Supported formats: JPEG, PNG, WebP. Maximum file size: 5MB
+                    </p>
+                    {imagePreview && (
+                      <div className="mt-3">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-32 h-32 object-contain rounded-lg border border-gray-300"
+                        />
+                      </div>
+                    )}
+                    {uploadingImage && (
+                      <div className="mt-2 flex items-center text-blue-600">
+                        <div className="loading-spinner w-4 h-4 border-2 mr-2"></div>
+                        <span className="text-sm">Uploading logo...</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <select
+                      {...register('isActive')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                    >
+                      <option value={true}>Active</option>
+                      <option value={false}>Inactive</option>
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(false)}
+                      className="w-full sm:w-auto px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg text-sm sm:text-base"
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="w-full sm:w-auto btn-primary flex items-center justify-center text-sm sm:text-base">
+                      <FaSave className="mr-2" />
+                      {editingItem ? 'Update' : 'Add'} Client
                     </button>
                   </div>
                 </form>

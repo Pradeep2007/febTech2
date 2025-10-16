@@ -56,7 +56,7 @@ const Navbar = () => {
   }, []);
 
   // Define sections for scroll spy (only on home page)
-  const sectionIds = ['home', 'about', 'members', 'products', 'clients', 'faq', 'contact'];
+  const sectionIds = ['home', 'about', 'members', 'products', 'clients','blog','faq', 'contact'];
   const activeSection = useScrollSpy(sectionIds, 150);
 
   const navItems = [

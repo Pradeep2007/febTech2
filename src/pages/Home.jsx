@@ -6,6 +6,7 @@ import Members from './Members';
 import client9 from '../assets/images/client9.png'
 import Clients from './Clients';
 import FAQ from './FAQ';
+import Blog from './BlogList'
 import Contact from './Contact';
 import { 
   FaShieldAlt, 
@@ -359,6 +360,11 @@ const Home = () => {
       {/* Clients Section */}
       <section id="clients">
         <Clients/>
+      </section>
+        
+      {/* Clients Section */}
+      <section id="blog">
+        <Blog/>
       </section>
 
       {/* FAQ Section */}
