@@ -9,7 +9,6 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 
-// Pages
 import Home from './pages/Home';
 import About from './pages/About';
 import Products from './pages/Products';
@@ -18,6 +17,8 @@ import Clients from './pages/Clients';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import BlogList from './pages/BlogList';
+import BlogDetail from './pages/BlogDetail';
 
 // Context
 import { AuthProvider } from './context/AuthContext';
@@ -57,6 +58,8 @@ function App() {
               <Route path="/clients" element={<Clients />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/blog" element={<BlogList />} />
+              <Route path="/blog/:id" element={<BlogDetail />} />
               <Route path="/admin" element={<Admin />} />
             </Routes>
           </AnimatePresence>

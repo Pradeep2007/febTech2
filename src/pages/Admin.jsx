@@ -14,7 +14,8 @@ import {
   FaQuestionCircle,
   FaSave,
   FaSearch,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaBlog
 } from 'react-icons/fa';
 import { 
   getProducts, 
@@ -23,12 +24,18 @@ import {
   deleteProduct,
   sampleProducts 
 } from '../services/productService';
-import { 
+import {
   getFaqs, 
   addFaq, 
   updateFaq, 
   deleteFaq 
 } from '../services/faqService';
+import {
+  getBlogs,
+  addBlog,
+  updateBlog,
+  deleteBlog
+} from '../services/blogService';
 import {
   getCategories,
   addCategory,
@@ -47,12 +54,14 @@ import {
 } from '../services/cloudinaryService';
 import AdminCategoriesTab from '../components/AdminCategoriesTab';
 import CategoryFormModal from '../components/CategoryFormModal';
+import AdminBlogsTab from '../components/AdminBlogsTab';
 
 const Admin = () => {
   const { currentUser, isAdmin, loading: authLoading, login, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('products');
   const [products, setProducts] = useState([]);
   const [faqs, setFaqs] = useState([]);
+  const [blogs, setBlogs] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -90,18 +99,23 @@ const Admin = () => {
       // Load FAQs from Firebase
       let faqData = await getFaqs();
       
+      // Load blogs from Firebase
+      let blogData = await getBlogs();
+      
       // Load categories from Firebase
       let categoryData = await getCategoriesWithFallback();
       
-      console.log('Loading data - Products:', productData.length, 'FAQs:', faqData.length, 'Categories:', categoryData.length);
+      console.log('Loading data - Products:', productData.length, 'FAQs:', faqData.length, 'Blogs:', blogData.length, 'Categories:', categoryData.length);
       setProducts(productData);
       setFaqs(faqData);
+      setBlogs(blogData);
       setCategories(categoryData);
     } catch (error) {
       console.error('Error loading data:', error);
-      // Fallback to sample data for products, empty for FAQs and categories
+      // Fallback to sample data for products, empty for others
       setProducts(sampleProducts);
       setFaqs([]);
+      setBlogs([]);
       setCategories([]);
     } finally {
       setLoading(false);
@@ -139,6 +153,12 @@ const Admin = () => {
     (category.subcategories && category.subcategories.some(sub => 
       sub.toLowerCase().includes(searchTerm.toLowerCase())
     ))
+  );
+
+  const filteredBlogs = blogs.filter(blog =>
+    blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    blog.author?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    blog.excerpt?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
 
@@ -341,6 +361,82 @@ const Admin = () => {
     } catch (error) {
       console.error('Error saving category:', error);
       toast.error('Error saving category: ' + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Blog management functions
+  const handleAddBlog = () => {
+    setEditingItem(null);
+    setActiveTab('blogs');
+    setShowModal(true);
+    reset({
+      title: '',
+      author: '',
+      excerpt: '',
+      content: '',
+      imageUrl: '',
+      isPublished: true
+    });
+  };
+
+  const handleEditBlog = (blog) => {
+    setEditingItem(blog);
+    setActiveTab('blogs');
+    setShowModal(true);
+    reset({
+      title: blog.title,
+      author: blog.author || '',
+      excerpt: blog.excerpt || '',
+      content: blog.content,
+      imageUrl: blog.imageUrl || '',
+      isPublished: blog.isPublished
+    });
+  };
+
+  const handleDeleteBlog = async (blogId) => {
+    if (window.confirm('Are you sure you want to delete this blog post?')) {
+      try {
+        setLoading(true);
+        await deleteBlog(blogId);
+        await loadData();
+        toast.success('Blog deleted successfully!');
+      } catch (error) {
+        console.error('Error deleting blog:', error);
+        toast.error('Error deleting blog: ' + error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleSaveBlog = async (data) => {
+    try {
+      setLoading(true);
+      const blogData = {
+        title: data.title,
+        author: data.author || 'Admin',
+        excerpt: data.excerpt || '',
+        content: data.content,
+        imageUrl: data.imageUrl || '',
+        isPublished: data.isPublished === 'true' || data.isPublished === true
+      };
+
+      if (editingItem) {
+        await updateBlog(editingItem.id, blogData);
+        toast.success('Blog updated successfully!');
+      } else {
+        await addBlog(blogData);
+        toast.success('Blog added successfully!');
+      }
+
+      await loadData();
+      setShowModal(false);
+      reset();
+    } catch (error) {
+      console.error('Error saving blog:', error);
+      toast.error('Error saving blog: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -663,6 +759,19 @@ const Admin = () => {
                 <span className="sm:hidden">Cat</span>
                 <span className="ml-1">({categories.length})</span>
               </button>
+              <button
+                onClick={() => setActiveTab('blogs')}
+                className={`py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-xs sm:text-sm whitespace-nowrap ${
+                  activeTab === 'blogs'
+                    ? 'border-teal-prime text-teal-prime'
+                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <FaBlog className="inline mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Blogs</span>
+                <span className="sm:hidden">Blog</span>
+                <span className="ml-1">({blogs.length})</span>
+              </button>
             </nav>
           </div>
 
@@ -684,16 +793,17 @@ const Admin = () => {
                 onClick={
                   activeTab === 'products' ? handleAddProduct : 
                   activeTab === 'faqs' ? handleAddFaq : 
-                  handleAddCategory
+                  activeTab === 'categories' ? handleAddCategory :
+                  handleAddBlog
                 }
                 className="btn-primary flex items-center justify-center text-sm sm:text-base px-3 py-2 sm:px-4"
               >
                 <FaPlus className="mr-2" />
                 <span className="hidden sm:inline">
-                  Add {activeTab === 'products' ? 'Product' : activeTab === 'faqs' ? 'FAQ' : 'Category'}
+                  Add {activeTab === 'products' ? 'Product' : activeTab === 'faqs' ? 'FAQ' : activeTab === 'categories' ? 'Category' : 'Blog'}
                 </span>
                 <span className="sm:hidden">
-                  {activeTab === 'products' ? 'Product' : activeTab === 'faqs' ? 'FAQ' : 'Category'}
+                  {activeTab === 'products' ? 'Product' : activeTab === 'faqs' ? 'FAQ' : activeTab === 'categories' ? 'Category' : 'Blog'}
                 </span>
               </button>
             </div>
@@ -843,6 +953,15 @@ const Admin = () => {
               />
             )}
 
+            {/* Blogs Tab */}
+            {activeTab === 'blogs' && (
+              <AdminBlogsTab
+                filteredBlogs={filteredBlogs}
+                handleEditBlog={handleEditBlog}
+                handleDeleteBlog={handleDeleteBlog}
+              />
+            )}
+
           </div>
         </div>
       </div>
@@ -861,7 +980,8 @@ const Admin = () => {
                   {editingItem ? 'Edit' : 'Add'} {
                     activeTab === 'products' ? 'Product' : 
                     activeTab === 'faqs' ? 'FAQ' : 
-                    'Category'
+                    activeTab === 'categories' ? 'Category' :
+                    'Blog'
                   }
                 </h3>
                 <button
@@ -1180,12 +1300,105 @@ const Admin = () => {
                     </button>
                   </div>
                 </form>
+              ) : activeTab === 'blogs' ? (
+                <form onSubmit={handleSubmit(handleSaveBlog)} className="space-y-3 sm:space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Blog Title *
+                    </label>
+                    <input
+                      type="text"
+                      {...register('title', { required: 'Blog title is required' })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                      placeholder="Enter blog title"
+                    />
+                    {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Author
+                    </label>
+                    <input
+                      type="text"
+                      {...register('author')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                      placeholder="Enter author name (default: Admin)"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Excerpt
+                    </label>
+                    <textarea
+                      {...register('excerpt')}
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                      placeholder="Brief summary of the blog post"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Content *
+                    </label>
+                    <textarea
+                      {...register('content', { required: 'Content is required' })}
+                      rows={8}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                      placeholder="Write your blog content here..."
+                    />
+                    {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Image URL
+                    </label>
+                    <input
+                      type="url"
+                      {...register('imageUrl')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                      placeholder="https://example.com/image.jpg"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Optional: Enter a URL for the blog featured image
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Status
+                    </label>
+                    <select
+                      {...register('isPublished')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-prime focus:border-transparent"
+                    >
+                      <option value={true}>Published</option>
+                      <option value={false}>Draft</option>
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(false)}
+                      className="w-full sm:w-auto px-4 py-2 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg text-sm sm:text-base"
+                    >
+                      Cancel
+                    </button>
+                    <button type="submit" className="w-full sm:w-auto btn-primary flex items-center justify-center text-sm sm:text-base">
+                      <FaSave className="mr-2" />
+                      {editingItem ? 'Update' : 'Add'} Blog
+                    </button>
+                  </div>
+                </form>
               ) : null}
             </div>
           </motion.div>
         </div>
       )}
-
       {/* Toast Container - handled by App.jsx */}
     </motion.div>
   );
