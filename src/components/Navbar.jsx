@@ -103,36 +103,35 @@ const Navbar = () => {
   };
 
   // Function to handle navigation
-  const handleNavigation = (item, e) => {
-    // Close mobile menu first
-    setIsOpen(false);
-    
-    // If we're on the home page and the section exists, scroll to it
-    if (location.pathname === '/' && document.getElementById(item.sectionId)) {
-      e.preventDefault();
-      
-      // Add small delay for mobile to ensure smooth scrolling
-      setTimeout(() => {
-        const element = document.getElementById(item.sectionId);
-        if (element) {
-          // Get the navbar height to offset the scroll position
-          const navbar = document.querySelector('nav');
-          const navbarHeight = navbar ? navbar.offsetHeight : 80;
-          
-          // Calculate the exact position to scroll to
-          const elementPosition = element.offsetTop;
-          const offsetPosition = elementPosition - navbarHeight;
-          
-          // Scroll to the exact position
-          window.scrollTo({
-            top: Math.max(0, offsetPosition),
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
-    }
-    // For navigation to other pages, let Link handle it normally
-  };
+  // Function to handle navigation
+const handleNavigation = (item, e) => {
+  // Close mobile menu first
+  setIsOpen(false);
+
+  // If we're on the home page and the item has a sectionId and the section exists, scroll to it
+  if (location.pathname === '/' && item.sectionId && document.getElementById(item.sectionId)) {
+    e.preventDefault();
+
+    // Wait a bit for mobile navbar to collapse before measuring height
+    setTimeout(() => {
+      const element = document.getElementById(item.sectionId);
+      if (element) {
+        const navbar = document.querySelector('nav');
+        const navbarHeight = navbar ? navbar.getBoundingClientRect().height : 80;
+
+        const elementPosition = element.offsetTop;
+        const offsetPosition = elementPosition - navbarHeight;
+
+        window.scrollTo({
+          top: Math.max(0, offsetPosition),
+          behavior: 'smooth',
+        });
+      }
+    }, 300); // <-- Delay helps correct scroll position on mobile
+  }
+  // For navigation to other pages, let Link handle it normally
+};
+
 
   // Determine if item should be active
   const isItemActive = (item) => {
