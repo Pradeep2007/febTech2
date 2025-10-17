@@ -4,6 +4,7 @@ import About from './About';
 import Products from './Products';
 import Members from './Members';
 import client9 from '../assets/images/client9.png'
+import awardImage from '../assets/images/award.jpg'
 import Clients from './Clients';
 import FAQ from './FAQ';
 import Blog from './BlogList'
@@ -14,49 +15,10 @@ import {
   FaAward,
   FaBox,
   FaShoppingCart,
-  FaHandshake,
-  FaChevronRight
+  FaHandshake
 } from 'react-icons/fa';
 
 const Home = () => {
-  const categories = [
-    {
-      name: "Sysmax-Biotsystems",
-      icon: FaBox,
-      description: "Advanced diagnostic equipment",
-    },
-    { 
-      name: "Rest Inc.", 
-      icon: FaShieldAlt, 
-      description: "Patient care solutions" 
-    },
-    {
-      name: "Pharmaceuticals",
-      icon: FaAward,
-      description: "Quality medicines & drugs",
-    },
-    {
-      name: "Medical Equipment",
-      icon: FaBox,
-      description: "Professional medical devices",
-    },
-  ];
-
-  const complianceItems = [
-    "FDA Approved",
-    "ISO 13485 Certified",
-    "GMP Compliant",
-    "CE Marked",
-  ];
-
-  const partnerBrands = [
-    "Johnson & Johnson",
-    "Pfizer",
-    "Medtronic",
-    "Siemens Healthineers",
-    "GE Healthcare",
-    "Baxter",
-  ];
 
   // Add missing features array
   const features = [
@@ -240,7 +202,7 @@ const Home = () => {
               Why Choose FabTech?
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-gray-600 px-4 sm:px-0">
-              We're committed to excellence in every aspect of our business
+              We&apos;re committed to excellence in every aspect of our business
             </p>
           </motion.div>
 
@@ -266,6 +228,80 @@ const Home = () => {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Awards Section */}
+      <section className="section-padding bg-gradient-to-br from-gray-50 via-white to-teal-50 relative overflow-hidden">
+        {/* Background decorative elements */}
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-r from-yellow-200 to-orange-200 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-72 h-72 bg-gradient-to-r from-teal-200 to-cyan-200 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div className="container-max relative z-10">
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+              Recognition & Awards
+            </h2>
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto px-4 sm:px-0">
+              Honored for our commitment to excellence in healthcare innovation
+            </p>
+          </motion.div>
+
+          <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 max-w-6xl mx-auto px-4 sm:px-6">
+            {/* Award Image */}
+            <motion.div
+              initial={{ x: -50, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="flex-1 w-full lg:w-auto"
+            >
+              <div className="relative group">
+                <div className="absolute -inset-4 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 rounded-2xl blur-lg opacity-25 group-hover:opacity-40 transition-opacity duration-300"></div>
+                <img
+                  src={awardImage}
+                  alt="FabTech Award Ceremony"
+                  className="relative w-full h-auto max-w-lg mx-auto rounded-2xl shadow-2xl object-cover"
+                />
+              </div>
+            </motion.div>
+
+            {/* Award Text */}
+            <motion.div
+              initial={{ x: 50, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="flex-1 text-center lg:text-left"
+            >
+              <div className="relative">
+                <FaAward className="text-4xl sm:text-5xl text-yellow-500 mb-6 mx-auto lg:mx-0" />
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-6 leading-tight">
+                  Growth Icon Recognition
+                </h3>
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl p-6 shadow-lg border border-gray-100">
+                  <p className="text-base sm:text-lg text-gray-700 leading-relaxed">
+                    <span className="font-semibold text-teal-700">Fabtech Team</span> is honoured to receive an award from{" "}
+                    <span className="font-semibold text-gray-900">Honourable Gujarat Chief Minister Shree Bhupendra Patel</span>, 
+                    recognised as <span className="font-semibold text-orange-600">growth icon</span> for exemplary performance in{" "}
+                    <span className="font-semibold text-teal-700">healthcare sector</span>.
+                  </p>
+                </div>
+                
+                {/* Decorative elements */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-yellow-400 rounded-full opacity-60"></div>
+                <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-teal-400 rounded-full opacity-60"></div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
